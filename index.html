@@ -3,280 +3,88 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Evil Encryption Academy — ransomware cryptography for defenders</title>
-<meta name="description" content="A structured path from &quot;I don't know what AES is&quot; to &quot;I can find the AES key in this memory dump and tell the client which files are recoverable.&quot;">
+<title>Encryption, and how ransomware uses it — Evil Encryption Academy</title>
+<meta name="description" content="Ransomware is an applied cryptography problem wearing a Windows costume. This site explains the encryption itself: the types, how each one works, how ranso">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --paper:#FBFBF9; --ink:#1B1F23; --slate:#5A6472; --faint:#8A93A0;
-  --rule:#E2E4E0; --panel:#F2F3F0;
-  --intact:#2E6F5E;      /* surviving plaintext */
-  --encrypted:#B03A2E;   /* encrypted / destroyed */
-  --sans:"IBM Plex Sans",system-ui,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,monospace;
-  --wrap:1080px;
-}
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
-     font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:var(--wrap);margin:0 auto;padding:0 28px}
-a{color:inherit}
-a:focus-visible,summary:focus-visible{outline:2.5px solid var(--encrypted);outline-offset:3px;border-radius:2px}
-
-/* ---------- hero: the tool output IS the display type ---------- */
-.hero{padding:76px 0 56px;border-bottom:1px solid var(--rule)}
-.eyebrow{font-family:var(--mono);font-size:13px;color:var(--faint);letter-spacing:.01em;margin:0 0 30px}
-.map{font-family:var(--mono);font-size:clamp(13px,2.5vw,22px);line-height:1.25;
-     white-space:nowrap;overflow:hidden;margin:0 0 14px;font-weight:500}
-.map i{font-style:normal;opacity:0;animation:settle .5s ease forwards}
-.map .e{color:var(--encrypted)}
-.map .p{color:var(--intact);opacity:.55}
-@keyframes settle{to{opacity:1}}
-@media (prefers-reduced-motion:reduce){.map i{animation:none;opacity:1}}
-.readout{font-family:var(--mono);font-size:13.5px;color:var(--slate);margin:0 0 40px}
-.readout b{color:var(--intact);font-weight:600}
-.readout s{color:var(--encrypted);text-decoration:none;font-weight:600}
-h1{font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.022em;font-weight:700;
-   margin:0 0 22px;max-width:19ch}
-.lede{font-size:clamp(17px,2vw,20px);color:var(--slate);max-width:62ch;margin:0 0 34px;line-height:1.55}
-.cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.btn{display:inline-block;padding:13px 22px;border-radius:3px;text-decoration:none;
-     font-weight:600;font-size:15.5px;border:1.5px solid var(--ink);transition:background .15s,color .15s}
-.btn-solid{background:var(--ink);color:var(--paper)}
-.btn-solid:hover{background:var(--encrypted);border-color:var(--encrypted)}
-.btn-ghost:hover{background:var(--panel)}
-
-/* ---------- sections ---------- */
-section{padding:64px 0;border-bottom:1px solid var(--rule)}
-h2{font-size:15px;font-weight:600;margin:0 0 8px;letter-spacing:.005em}
-.sub{color:var(--slate);margin:0 0 34px;max-width:66ch;font-size:16px}
-
-/* start here */
-.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:0;
-       border:1px solid var(--rule);border-radius:4px;overflow:hidden}
-.path{padding:26px 24px;text-decoration:none;display:block;border-right:1px solid var(--rule);
-      transition:background .15s}
-.path:last-child{border-right:none}
-.path:hover{background:var(--panel)}
-.path .who{font-size:14px;color:var(--faint);margin:0 0 7px}
-.path .go{font-weight:600;font-size:18px;margin:0 0 7px;line-height:1.3}
-.path .why{font-size:14.5px;color:var(--slate);margin:0;line-height:1.5}
-
-/* curriculum: a real sequence, so numbers are earned */
-ol.mods{list-style:none;padding:0;margin:0;counter-reset:m -1}
-ol.mods li{counter-increment:m;border-top:1px solid var(--rule)}
-ol.mods li:last-child{border-bottom:1px solid var(--rule)}
-ol.mods a{display:grid;grid-template-columns:52px 1fr auto;gap:18px;align-items:baseline;
-          padding:15px 10px;text-decoration:none;transition:background .15s}
-ol.mods a:hover{background:var(--panel)}
-ol.mods a::before{content:counter(m,decimal-leading-zero);font-family:var(--mono);
-                  font-size:13px;color:var(--faint)}
-.mtitle{font-weight:600;font-size:16.5px}
-.mdesc{display:block;font-weight:400;color:var(--slate);font-size:14.5px;margin-top:2px;line-height:1.45}
-.tag{font-family:var(--mono);font-size:11.5px;color:var(--faint);white-space:nowrap}
-
-/* tools */
-.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:26px}
-.tool h3{font-family:var(--mono);font-size:14.5px;margin:0 0 6px;font-weight:600}
-.tool p{margin:0;color:var(--slate);font-size:14.5px;line-height:1.5}
-.pipe{font-family:var(--mono);font-size:13px;color:var(--slate);background:var(--panel);
-      border-left:2.5px solid var(--intact);padding:16px 18px;margin:0 0 30px;
-      overflow-x:auto;white-space:pre;border-radius:0 3px 3px 0}
-
-/* capstone */
-.capstone{background:var(--panel);border-radius:4px;padding:34px 30px}
-.capstone h2{margin-bottom:12px}
-.capstone p{color:var(--slate);max-width:60ch;margin:0 0 20px}
-.capstone code{font-family:var(--mono);font-size:13.5px;background:var(--paper);
-               padding:2px 6px;border-radius:2px;border:1px solid var(--rule)}
-
-/* scope */
-.scope{display:grid;grid-template-columns:1fr 1fr;gap:34px}
-.scope h3{font-size:15px;margin:0 0 10px;font-weight:600}
-.scope h3.no{color:var(--encrypted)}
-.scope h3.yes{color:var(--intact)}
-.scope ul{margin:0;padding-left:19px;color:var(--slate);font-size:14.5px;line-height:1.65}
-footer{padding:44px 0 60px;color:var(--faint);font-size:14px}
-footer a{color:var(--slate)}
-@media(max-width:720px){
-  .scope{grid-template-columns:1fr;gap:26px}
-  .path{border-right:none;border-bottom:1px solid var(--rule)}
-  .path:last-child{border-bottom:none}
-  ol.mods a{grid-template-columns:34px 1fr;gap:12px}
-  .tag{display:none}
-}
-</style>
+<link rel="stylesheet" href="assets/academy.css">
 </head>
 <body>
+<button class="menu-btn ghost">Menu</button>
+<div class="shell">
+<aside class="side">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<nav>
+  <h4>Foundations</h4>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-symmetric.html" data-p="02"><i>02</i>Symmetric encryption</a>
+  <a href="03-modes.html" data-p="03"><i>03</i>Modes of operation</a>
+  <a href="04-asymmetric.html" data-p="04"><i>04</i>Asymmetric encryption</a>
+  <h4>Ransomware encryption</h4>
+  <a href="05-hybrid.html" data-p="05"><i>05</i>The hybrid scheme</a>
+  <a href="06-coverage.html" data-p="06"><i>06</i>How much gets encrypted</a>
+  <a href="07-key-models.html" data-p="07"><i>07</i>Key models</a>
+  <a href="08-os-native.html" data-p="08"><i>08</i>OS-native encryption</a>
+  <h4>Putting it together</h4>
+  <a href="09-telling-them-apart.html" data-p="09"><i>09</i>Telling them apart</a>
+</nav>
+</aside>
+<main>
+<p class="crumb">Evil Encryption Academy</p>
+<h1>Encryption, and how ransomware uses it</h1>
+<p class="lede">Ransomware is an applied cryptography problem wearing a Windows costume. This site explains the encryption itself: the types, how each one works, how ransomware combines them, and how to tell the schemes apart. Every page has a working simulation.</p>
 
-<header class="hero">
-  <div class="wrap">
-    <p class="eyebrow">recover_partial.py — 21 MB database, encrypted at 0.9%</p>
+<h2>Why encryption is the whole story</h2>
+<p>Strip away the delivery, the extortion and the branding, and every ransomware family reduces
+to a handful of cryptographic decisions: which cipher encrypts the data, which one protects the
+key, how much of each file gets touched, and whether one key or many are used.</p>
+<p>Those four decisions determine everything a defender can observe and everything a victim
+experiences. Learn them and the families stop looking like a hundred different threats and start
+looking like a small number of recurring designs.</p>
 
-    <div class="map" id="map" aria-label="Entropy region map: three narrow encrypted regions, the rest surviving plaintext"></div>
-    <p class="readout">
-      <s>encrypted 189,580 bytes (0.9%)</s> &nbsp;·&nbsp;
-      <b>recoverable 20,864,000 bytes (99.1%)</b>
-    </p>
+<h2>What you will be able to do</h2>
+<ul>
+  <li>Explain the difference between encoding, hashing and encryption, and why only one of them locks anything</li>
+  <li>Describe how AES and ChaCha20 work, and why the mode of operation matters more than the cipher</li>
+  <li>Explain why RSA and elliptic curves cannot encrypt a hard drive, and what they are actually for</li>
+  <li>Describe the hybrid scheme every modern family uses, and why it is so effective</li>
+  <li>Recognise full, header-only, intermittent and chunked encryption from the shape of the result</li>
+  <li>Tell one scheme apart from another using only the encrypted output</li>
+</ul>
 
-    <h1>Most of that file was never encrypted.</h1>
-    <p class="lede">
-      Fast ransomware breaks a file's structure, not its contents. Knowing the difference
-      is what separates "everything is gone" from getting the data back. This is a
-      complete course in how ransomware encryption actually works, and how to defeat it.
-    </p>
+<h2>The path</h2>
+<table>
+<tr><th>#</th><th>Topic</th><th>The idea</th></tr>
+<tr><td>01</td><td><a href="01-what-encryption-is.html">What encryption is</a></td><td>Three things people confuse, and the operation underneath all of them</td></tr>
+<tr><td>02</td><td><a href="02-symmetric.html">Symmetric encryption</a></td><td>One key, enormous speed, and the two cipher families</td></tr>
+<tr><td>03</td><td><a href="03-modes.html">Modes of operation</a></td><td>Where a correct cipher still produces a broken result</td></tr>
+<tr><td>04</td><td><a href="04-asymmetric.html">Asymmetric encryption</a></td><td>Two keys, tiny capacity, and why that is enough</td></tr>
+<tr><td>05</td><td><a href="05-hybrid.html">The hybrid scheme</a></td><td>How the two families combine into the ransomware core</td></tr>
+<tr><td>06</td><td><a href="06-coverage.html">How much gets encrypted</a></td><td>Full, header-only, intermittent, chunked</td></tr>
+<tr><td>07</td><td><a href="07-key-models.html">Key models</a></td><td>One key for everything, or one key per file</td></tr>
+<tr><td>08</td><td><a href="08-os-native.html">OS-native encryption</a></td><td>When the operating system does the encrypting</td></tr>
+<tr><td>09</td><td><a href="09-telling-them-apart.html">Telling them apart</a></td><td>Identifying a scheme from its output alone</td></tr>
+</table>
 
-    <div class="cta">
-      <a class="btn btn-solid" href="https://github.com/IronBranded/Evil-Encryption-Academy#readme">Open the academy</a>
-      <a class="btn btn-ghost" href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/capstone">Try the capstone</a>
-    </div>
-  </div>
-</header>
+<div class="note">
+<p><b>Concepts, not operations.</b> This site explains how encryption schemes work and how to
+recognise them. It contains no encryption tooling, no malware, and no operational procedures.
+The simulations run entirely in your browser using the standard Web Crypto API, and the keys
+are printed on screen — nothing here is secret and nothing is irreversible.</p>
+</div>
 
-<section>
-  <div class="wrap">
-    <h2>Start where you are</h2>
-    <p class="sub">Four entry points. Pick the one that matches why you're here.</p>
-    <div class="paths">
-      <a class="path" href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/00-Foundations">
-        <p class="who">New to this</p>
-        <p class="go">Foundations</p>
-        <p class="why">Encoding, hashing and encryption are three different things. Start by learning which is which.</p>
-      </a>
-      <a class="path" href="https://github.com/IronBranded/Evil-Encryption-Academy/blob/main/FIRST-60-MINUTES.md">
-        <p class="who">Responding right now</p>
-        <p class="go">First 60 minutes</p>
-        <p class="why">Ordered by evidence volatility. The first instruction is: do not power the machines off.</p>
-      </a>
-      <a class="path" href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/07-Memory-Forensics">
-        <p class="who">Chasing a key</p>
-        <p class="go">Memory forensics</p>
-        <p class="why">The plaintext key exists in RAM for a few minutes. This is how you get it out and prove it's right.</p>
-      </a>
-      <a class="path" href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/08-Reverse-Engineering">
-        <p class="who">Reversing a sample</p>
-        <p class="go">Stripped binaries</p>
-        <p class="why">No import table, no symbols, 90% library code. Work outward from the constants.</p>
-      </a>
-    </div>
-  </div>
-</section>
+<h2>Start</h2>
+<p style="margin-top:20px"><a href="01-what-encryption-is.html"><button>Begin with module 01</button></a></p>
 
-<section>
-  <div class="wrap">
-    <h2>The curriculum</h2>
-    <p class="sub">Twelve modules. They build on each other, so the order is the argument — but 02 and 07 are the pair that matter most if you only read two.</p>
-    <ol class="mods">
-      <li><a href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/00-Foundations"><span class="mtitle">Foundations<span class="mdesc">XOR, entropy, and the three things beginners conflate</span></span><span class="tag">beginner</span></a></li>
-      <li><a href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/01-Symmetric-Cryptography"><span class="mtitle">Symmetric cryptography<span class="mdesc">Watch AES-ECB leak an image straight through the ciphertext</span></span><span class="tag">runnable labs</span></a></li>
-      <li><a href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/02-Hybrid-Encryption-Model"><span class="mtitle">The hybrid model<span class="mdesc">Why the file is locked, and the one window where it isn't</span></span><span class="tag">core</span></a></li>
-      <li><a href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/03-Encryption-Paradigms"><span class="mtitle">Encryption paradigms<span class="mdesc">Full, intermittent, header-only, chunked — and what each leaves behind</span></span><span class="tag"></span></a></li>
-      <li><a href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/04-Platform-And-LOTL-Encryption"><span class="mtitle">Platform and living-off-the-land<span class="mdesc">BitLocker abuse, where there is no malware to reverse</span></span><span class="tag"></span></a></li>
-      <li><a href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/05-Windows-Crypto-Internals"><span class="mtitle">Windows crypto internals<span class="mdesc">Where keys physically live, and why it isn't LSASS</span></span><span class="tag">advanced</span></a></li>
-      <li><a href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/06-Case-Studies"><span class="mtitle">Case studies<span class="mdesc">The Gentlemen and DeadLock, from Microsoft's own teardowns</span></span><span class="tag"></span></a></li>
-      <li><a href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/07-Memory-Forensics"><span class="mtitle">Memory forensics<span class="mdesc">An AES key schedule is 240 bytes and mathematically verifiable</span></span><span class="tag">core</span></a></li>
-      <li><a href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/08-Reverse-Engineering"><span class="mtitle">Reverse engineering<span class="mdesc">Go and Rust samples, and cutting through the library noise</span></span><span class="tag">advanced</span></a></li>
-      <li><a href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/09-Triage-and-IR"><span class="mtitle">Triage and incident response<span class="mdesc">Building a timeline when the logs have been deliberately destroyed</span></span><span class="tag"></span></a></li>
-      <li><a href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/10-Recovery-and-Decryption"><span class="mtitle">Recovery and decryption<span class="mdesc">The only question the victim asked: are we getting our data back?</span></span><span class="tag"></span></a></li>
-      <li><a href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/11-Endpoint-Detection"><span class="mtitle">Endpoint detection<span class="mdesc">How EDR catches ransomware, and the gaps it can't see</span></span><span class="tag"></span></a></li>
-    </ol>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <h2>Working tools, not pseudocode</h2>
-    <p class="sub">Six programs, covered by 54 tests. Every test exists because a real bug shipped. The analysis tools are stdlib-only so they run on a locked-down forensic workstation with no package installs.</p>
-
-    <div class="pipe">evidence
-  ├─ identify_crypto.py   what cipher? hybrid? statically linked?
-  ├─ parse_footer.py      encrypted at all? which paradigm? footer layout?
-  ├─ recover_partial.py   how much survived? extract it, offsets preserved
-  └─ parse_footer.py      run it again — an intact header means you got it right</div>
-
-    <div class="tools">
-      <div class="tool"><h3>identify_crypto.py</h3><p>Sixty signatures: cipher constants, Windows crypto APIs, container magics, build toolchain. Refuses to draw a recoverability conclusion from filtered evidence.</p></div>
-      <div class="tool"><h3>parse_footer.py</h3><p>Classifies the encryption paradigm and reconciles file format against extension — so it doesn't call every JPEG on your file server encrypted.</p></div>
-      <div class="tool"><h3>recover_partial.py</h3><p>Extracts surviving plaintext with no key. Nulls damaged regions instead of removing them, so internal pointers still resolve.</p></div>
-      <div class="tool"><h3>canary_deploy.py</h3><p>Decoy files that no legitimate process should touch. The one ransomware signal that needs no threshold and no tuning.</p></div>
-      <div class="tool"><h3>encryption_demo.py</h3><p>Five demos that make entropy stop being abstract, plus safe practice specimens so you never need live malware.</p></div>
-      <div class="tool"><h3>Detection rules</h3><p>YARA for cipher constants and embedded keys, Sigma for the anti-recovery behaviour that fires minutes before encryption starts.</p></div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="capstone">
-      <h2>Then prove you can do it</h2>
-      <p>The capstone generates a complete synthetic incident — a mixed file share, surviving backups, a ransom note, a tripped canary, a log excerpt and a recovered binary. Your deliverable is one recoverability assessment, scored against an answer key out of 100.</p>
-      <p>Two of the traps produce a confident, specific, wrong answer. That's the failure mode that matters, because nobody questions a number that came from a tool.</p>
-      <p><code>python3 capstone/generate_incident.py --outdir ./incident-alpha</code></p>
-      <a class="btn btn-solid" href="https://github.com/IronBranded/Evil-Encryption-Academy/tree/main/capstone">Start the capstone</a>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <h2>What this is, and what it refuses to be</h2>
-    <p class="sub">This is a read-side curriculum. It teaches you to recognise, analyse, detect and recover from ransomware encryption. It contains no ransomware.</p>
-    <div class="scope">
-      <div>
-        <h3 class="no">Deliberately absent</h3>
-        <ul>
-          <li>Encryptor proof-of-concept code</li>
-          <li>File traversal and target selection</li>
-          <li>Backup and shadow-copy destruction</li>
-          <li>Throughput and evasion techniques</li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="yes">Fully covered</h3>
-        <ul>
-          <li>The cryptography itself, in full</li>
-          <li>Memory forensics and key recovery</li>
-          <li>Detection content and hunting guidance</li>
-          <li>Analysis, triage and recovery tooling</li>
-        </ul>
-      </div>
-    </div>
-    <p class="sub" style="margin:26px 0 0">An incident responder never needs to write an encryptor, and the read-side skills are the ones that are actually scarce. <a href="https://github.com/IronBranded/Evil-Encryption-Academy/blob/main/SCOPE.md">The full reasoning is in SCOPE.md</a>.</p>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap">
-    MIT licensed ·
-    <a href="https://github.com/IronBranded/Evil-Encryption-Academy">Source</a> ·
-    <a href="https://github.com/IronBranded/Evil-Encryption-Academy/blob/main/CONTRIBUTING.md">Contributing</a> ·
-    <a href="https://github.com/IronBranded/Evil-Encryption-Academy/blob/main/labs/SAFE_LAB_SETUP.md">Lab safety</a> ·
-    <a href="https://github.com/IronBranded/Evil-Encryption-Academy/blob/main/MYTHS.md">Myths</a>
-    <br><br>
-    Case studies are grounded in Microsoft Threat Intelligence primary reporting. Verify per sample — reporting ages fast.
-  </div>
-</footer>
-
+<div class="pager"><span></span><a class="nxt" href="01-what-encryption-is.html"><em>Next</em>What encryption is</a></div>
+</main>
+</div>
+<script src="assets/academy.js"></script>
 <script>
-// Draw the real region map from recover_partial.py: three narrow encrypted
-// bands at head, midpoint and tail. Blocks resolve left to right once, as the
-// scan would produce them. One orchestrated moment, then it stays still.
-(function () {
-  var el = document.getElementById('map');
-  if (!el) return;
-  var COLS = 64, enc = [0, 32, 33, 63], out = '';
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  for (var i = 0; i < COLS; i++) {
-    var isEnc = enc.indexOf(i) !== -1;
-    var delay = reduce ? 0 : (i * 11);
-    out += '<i class="' + (isEnc ? 'e' : 'p') + '" style="animation-delay:' +
-           delay + 'ms">' + (isEnc ? '\u2588' : '\u00B7') + '</i>';
-  }
-  el.innerHTML = out;
-})();
+(function(){var l=document.querySelector('.side a[data-p="index"]');if(l)l.classList.add('on');})();
 </script>
+
 </body>
 </html>

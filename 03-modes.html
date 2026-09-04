@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modes of operation — Evil Encryption Academy</title>
+<meta name="description" content="AES is not broken. AES-ECB is. The mode decides whether a perfectly correct cipher produces a secure result or leaks your data in plain sight.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+</head>
+<body>
+<button class="menu-btn ghost">Menu</button>
+<div class="shell">
+<aside class="side">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<nav>
+  <h4>Foundations</h4>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-symmetric.html" data-p="02"><i>02</i>Symmetric encryption</a>
+  <a href="03-modes.html" data-p="03"><i>03</i>Modes of operation</a>
+  <a href="04-asymmetric.html" data-p="04"><i>04</i>Asymmetric encryption</a>
+  <h4>Ransomware encryption</h4>
+  <a href="05-hybrid.html" data-p="05"><i>05</i>The hybrid scheme</a>
+  <a href="06-coverage.html" data-p="06"><i>06</i>How much gets encrypted</a>
+  <a href="07-key-models.html" data-p="07"><i>07</i>Key models</a>
+  <a href="08-os-native.html" data-p="08"><i>08</i>OS-native encryption</a>
+  <h4>Putting it together</h4>
+  <a href="09-telling-them-apart.html" data-p="09"><i>09</i>Telling them apart</a>
+</nav>
+</aside>
+<main>
+<p class="crumb">Foundations · 03</p>
+<h1>Modes of operation</h1>
+<p class="lede">AES is not broken. AES-ECB is. The mode decides whether a perfectly correct cipher produces a secure result or leaks your data in plain sight.</p>
+
+<h2>The problem a mode solves</h2>
+<p>A block cipher encrypts exactly 16 bytes. Real files are larger, so something has to decide how
+the blocks relate to each other. That decision is the <em>mode of operation</em>, and it matters
+more than the choice of cipher.</p>
+
+<table>
+<tr><th>Mode</th><th>How blocks relate</th><th>Recognisable by</th></tr>
+<tr><td><strong>ECB</strong></td><td>Each block encrypted independently</td><td><strong>Repeating 16-byte ciphertext blocks</strong></td></tr>
+<tr><td><strong>CBC</strong></td><td>Each block XORed with the previous ciphertext</td><td>16-byte IV, size a multiple of 16, padding</td></tr>
+<tr><td><strong>CTR</strong></td><td>Counter encrypted to make a keystream</td><td>Output identical in size to input</td></tr>
+<tr><td><strong>GCM</strong></td><td>CTR plus an authentication tag</td><td>12-byte nonce, 16-byte tag appended</td></tr>
+<tr><td><strong>XTS</strong></td><td>Tweaked per disk sector</td><td>Full-disk encryption; used by BitLocker</td></tr>
+</table>
+
+<h2>Why ECB fails, seen directly</h2>
+<p>ECB encrypts each block on its own, with no reference to any other block. So identical
+plaintext blocks always produce identical ciphertext blocks. Any large uniform region of a
+file — a background, a run of zeroes, a repeated record — stays uniform after encryption.</p>
+<p>The image below is encrypted with real AES-256. Both panels use the same key.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · the same image, two modes</b><span>real AES-256, identical key</span></div>
+  <div class="sim-body">
+    <div class="grid2">
+      <div><canvas id="s4-src" width="160" height="120" style="width:100%"></canvas>
+        <p class="cap">original</p></div>
+      <div><canvas id="s4-ecb" width="160" height="120" style="width:100%"></canvas>
+        <p class="cap c-cipher">AES-256-ECB — still readable</p></div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div><canvas id="s4-cbc" width="160" height="120" style="width:100%"></canvas>
+        <p class="cap c-plain">AES-256-CBC — structure destroyed</p></div>
+      <div>
+        <p class="stat" id="s4-stats"></p>
+        <p class="stat" style="margin-top:10px">ECB scores high entropy <em>and is still broken</em>.
+        Entropy measures how evenly bytes are distributed. It cannot see that the same block
+        keeps repeating, which is exactly what leaks the picture.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>The measurement that catches ECB is not entropy but <strong>distinct block count</strong>. If a
+file's 16-byte blocks repeat, the plaintext blocks repeated too — and that leaks structure
+without needing the key at all.</p>
+
+<h2>The avalanche effect</h2>
+<p>Change one bit of input and roughly half of every output bit changes. This is a design
+requirement, and it is why there is no such thing as a nearly-correct key.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · one bit in, half the output changes</b><span>AES-256-CBC</span></div>
+  <div class="sim-body">
+    <div class="row"><input type="text" id="s5-in" value="Transfer 1000.00 GBP to account 4417"></div>
+    <div class="row"><label>Flip bit</label><input type="range" id="s5-b" min="0" max="63" value="0" style="flex:1">
+      <span class="stat" id="s5-bv"></span></div>
+    <div class="out tight" id="s5-out"></div>
+    <p class="stat" id="s5-stat"></p>
+  </div>
+</div>
+
+<div class="note">
+<p><b>What this rules out.</b> There is no partial progress against a cipher. Guessing 255 of 256
+key bits correctly produces output as wrong as guessing none of them. Brute force is not a
+strategy against a correctly used cipher — which is why the interesting questions are always
+about how the key was made and where it went, not about the cipher itself.</p>
+</div>
+
+<div class="pager"><a href="02-symmetric.html"><em>Previous</em>Symmetric encryption</a><a class="nxt" href="04-asymmetric.html"><em>Next</em>Asymmetric encryption</a></div>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="03"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+/* ---- ECB vs CBC on a real image ---- */
+function drawSource(ctx,w,h){
+  ctx.fillStyle='#FCFCFA'; ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#191D21';
+  ctx.fillRect(46,52,68,52);                                  // body
+  ctx.lineWidth=11; ctx.strokeStyle='#191D21';
+  ctx.beginPath(); ctx.arc(80,52,22,Math.PI,0); ctx.stroke();  // shackle
+  ctx.fillStyle='#FCFCFA';
+  ctx.beginPath(); ctx.arc(80,72,8,0,Math.PI*2); ctx.fill();   // keyhole
+  ctx.fillRect(76,72,8,20);
+}
+async function s4run(){
+  const w=160,h=120;
+  const src=document.getElementById('s4-src'), sc=src.getContext('2d');
+  drawSource(sc,w,h);
+  const img=sc.getImageData(0,0,w,h);
+  // one byte per pixel, padded to a 16-byte multiple
+  const n=w*h, pad=(16-(n%16))%16, gray=new Uint8Array(n+pad);
+  for(let i=0;i<n;i++) gray[i]=img.data[i*4];
+  const k=await demoKeyBytes('module-03-image');
+  const ecb=await aesECB(gray,k);
+  const cbc=await aesCBC(gray,k,new Uint8Array(16));
+  const paint=(id,data)=>{
+    const c=document.getElementById(id), cx=c.getContext('2d');
+    const o=cx.createImageData(w,h);
+    for(let i=0;i<n;i++){ const v=data[i];
+      o.data[i*4]=o.data[i*4+1]=o.data[i*4+2]=v; o.data[i*4+3]=255; }
+    cx.putImageData(o,0,0);
+  };
+  paint('s4-ecb',ecb); paint('s4-cbc',cbc);
+  const total=Math.floor(gray.length/16);
+  document.getElementById('s4-stats').innerHTML =
+    'plaintext entropy <b>'+shannon(gray).toFixed(2)+'</b><br>'+
+    'ECB entropy <b>'+shannon(ecb).toFixed(2)+'</b><br>'+
+    'CBC entropy <b>'+shannon(cbc).toFixed(2)+'</b><br><br>'+
+    'distinct 16-byte blocks<br>ECB <b class="c-cipher">'+distinctBlocks(ecb)+'</b> of '+total+
+    '<br>CBC <b class="c-plain">'+distinctBlocks(cbc)+'</b> of '+total;
+}
+s4run();
+
+/* ---- avalanche ---- */
+async function s5run(){
+  const v=document.getElementById('s5-in').value;
+  const bit=+document.getElementById('s5-b').value;
+  const a=bytes(v); const b=new Uint8Array(a);
+  const byteI=Math.floor(bit/8)%b.length;
+  b[byteI]^=(1<<(bit%8));
+  document.getElementById('s5-bv').textContent='byte '+byteI+', bit '+(bit%8);
+  const k=await demoKeyBytes('module-03-av'), iv=new Uint8Array(16);
+  const ca=await aesCBC(a,k,iv), cb=await aesCBC(b,k,iv);
+  let diffBits=0,diffBytes=0;
+  for(let i=0;i<Math.min(ca.length,cb.length);i++){
+    const x=ca[i]^cb[i]; if(x) diffBytes++;
+    for(let j=0;j<8;j++) if(x&(1<<j)) diffBits++;
+  }
+  const tot=Math.min(ca.length,cb.length)*8;
+  document.getElementById('s5-out').textContent =
+    'input A   '+hex(a.slice(0,16))+'\n'+
+    'input B   '+hex(b.slice(0,16))+'   ← one bit different\n\n'+
+    'cipher A  '+hex(ca.slice(0,16))+'\n'+
+    'cipher B  '+hex(cb.slice(0,16));
+  document.getElementById('s5-stat').textContent =
+    'bytes changed '+diffBytes+' of '+Math.min(ca.length,cb.length)+
+    '   ·   bits changed '+diffBits+' of '+tot+'  ('+(diffBits/tot*100).toFixed(1)+'%)';
+}
+document.getElementById('s5-b').addEventListener('input',s5run);
+document.getElementById('s5-in').addEventListener('input',s5run);
+s5run();
+</script>
+</body>
+</html>

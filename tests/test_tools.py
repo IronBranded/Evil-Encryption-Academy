@@ -547,6 +547,47 @@ class TestRepositoryIntegrity(unittest.TestCase):
                         bad.append(f"{os.path.relpath(p, ROOT)} -> {link}")
         self.assertEqual(bad, [], f"dead internal links: {bad}")
 
+    def test_site_pages_have_valid_javascript(self):
+        """
+        BUG: a Python escape collapsed \\' into a bare apostrophe inside a
+        single-quoted JS string, silently breaking an entire page simulation.
+        Balanced-brace heuristics caught it; only a real parser proves it fixed.
+        Skips cleanly where node is unavailable.
+        """
+        import re, shutil, subprocess, tempfile
+        node = shutil.which("node")
+        pages = [f for f in os.listdir(ROOT) if f.endswith(".html")]
+        self.assertTrue(pages, "no site pages found")
+        if not node:
+            self.skipTest("node not available")
+        for p in pages:
+            with open(os.path.join(ROOT, p), encoding="utf-8") as fh:
+                body = fh.read()
+            js = "\n".join(re.findall(r"<script>(.*?)</script>", body, re.S))
+            if not js.strip():
+                continue
+            with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False,
+                                             encoding="utf-8") as tf:
+                tf.write(js)
+                path = tf.name
+            try:
+                r = subprocess.run([node, "--check", path],
+                                   capture_output=True, text=True)
+                self.assertEqual(r.returncode, 0, f"{p} has invalid JS:\n{r.stderr}")
+            finally:
+                os.unlink(path)
+
+    def test_site_pages_link_only_to_existing_files(self):
+        import re
+        bad = []
+        for p in [f for f in os.listdir(ROOT) if f.endswith(".html")]:
+            with open(os.path.join(ROOT, p), encoding="utf-8") as fh:
+                body = fh.read()
+            for href in re.findall(r'href="(?!https?:|#|mailto:)([^"]+)"', body):
+                if not os.path.exists(os.path.join(ROOT, href)):
+                    bad.append(f"{p} -> {href}")
+        self.assertEqual(bad, [], f"dead links in site pages: {bad}")
+
     def test_license_exists_and_matches_claims(self):
         """Six files claim MIT. Without a LICENSE the repo is all-rights-reserved."""
         lic = os.path.join(ROOT, "LICENSE")

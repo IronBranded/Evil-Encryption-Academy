@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Key models — Evil Encryption Academy</title>
+<meta name="description" content="One key for the whole machine, or a fresh key for every file. This single design choice changes more about a scheme than the choice of cipher does.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+</head>
+<body>
+<button class="menu-btn ghost">Menu</button>
+<div class="shell">
+<aside class="side">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<nav>
+  <h4>Foundations</h4>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-symmetric.html" data-p="02"><i>02</i>Symmetric encryption</a>
+  <a href="03-modes.html" data-p="03"><i>03</i>Modes of operation</a>
+  <a href="04-asymmetric.html" data-p="04"><i>04</i>Asymmetric encryption</a>
+  <h4>Ransomware encryption</h4>
+  <a href="05-hybrid.html" data-p="05"><i>05</i>The hybrid scheme</a>
+  <a href="06-coverage.html" data-p="06"><i>06</i>How much gets encrypted</a>
+  <a href="07-key-models.html" data-p="07"><i>07</i>Key models</a>
+  <a href="08-os-native.html" data-p="08"><i>08</i>OS-native encryption</a>
+  <h4>Putting it together</h4>
+  <a href="09-telling-them-apart.html" data-p="09"><i>09</i>Telling them apart</a>
+</nav>
+</aside>
+<main>
+<p class="crumb">Ransomware encryption · 07</p>
+<h1>Key models</h1>
+<p class="lede">One key for the whole machine, or a fresh key for every file. This single design choice changes more about a scheme than the choice of cipher does.</p>
+
+<h2>Two designs</h2>
+<table>
+<tr><th></th><th>Session key</th><th>Per-file keys</th></tr>
+<tr><td>Keys generated</td><td>One, for the whole host</td><td>One per file</td></tr>
+<tr><td>Wrapped blobs on disk</td><td>All identical, or stored once</td><td>All different</td></tr>
+<tr><td>Speed</td><td>Slightly faster — one wrap operation</td><td>One wrap per file</td></tr>
+<tr><td>Cross-file analysis</td><td>Possible — patterns may repeat</td><td>Impossible — nothing is shared</td></tr>
+</table>
+
+<p>Older families frequently used a session key because it is simpler. Modern ones use per-file
+keys almost universally, because it removes an entire category of weakness: with a fresh key and
+fresh nonce for every file, no two files share anything an analyst could compare.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · what each model leaves on disk</b><span>compare the wrapped blobs</span></div>
+  <div class="sim-body">
+    <div class="row">
+      <label>Key model</label>
+      <select id="s9-mode">
+        <option value="session">Session key — one for the host</option>
+        <option value="perfile" selected>Per-file keys</option>
+      </select>
+      <button id="s9-go">Encrypt five files</button>
+    </div>
+    <div class="out tight" id="s9-out" style="min-height:150px"></div>
+    <p class="stat" id="s9-stat"></p>
+  </div>
+</div>
+
+<h2>Ephemeral key agreement</h2>
+<p>The most current designs go further than a random key per file. For each file they generate a
+whole throwaway <em>keypair</em>, then use elliptic-curve Diffie-Hellman against the operator's
+embedded public key to derive a shared secret. That secret becomes the file's encryption key.</p>
+
+<div class="out tight">for every file:
+  1. generate a throwaway keypair          (ephemeral private + public)
+  2. combine ephemeral private + operator public   → shared secret
+  3. use the shared secret as the file key
+  4. store the ephemeral PUBLIC key with the file
+  5. discard the ephemeral private key</div>
+
+<p>Several properties fall out of this, and they are worth understanding because they explain why
+these schemes have no analytical weak points:</p>
+<ul>
+  <li><strong>Nothing sensitive is stored.</strong> The value written to the file is a public key.
+      On its own it reveals nothing.</li>
+  <li><strong>No nonce field is needed.</strong> The nonce can be derived deterministically from
+      the stored public key, so it never has to be written separately.</li>
+  <li><strong>A fixed nonce becomes safe.</strong> Reusing a nonce is normally a serious bug, but
+      it is only dangerous when the <em>key</em> repeats. Here every file has a unique shared
+      secret, so a constant nonce never repeats under the same key.</li>
+</ul>
+
+<div class="note">
+<p><b>Why that last point is worth remembering.</b> Seeing a zero nonce in a scheme usually
+indicates a mistake. In a per-file ephemeral design it does not — the key lifecycle makes it
+sound. Judging the nonce without checking how the key was produced gets this exactly backwards.</p>
+</div>
+
+<div class="pager"><a href="06-coverage.html"><em>Previous</em>How much gets encrypted</a><a class="nxt" href="08-os-native.html"><em>Next</em>OS-native encryption</a></div>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="07"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+async function s9run(){
+  const mode=document.getElementById('s9-mode').value;
+  const names=['invoice.xlsx','ledger.mdf','contract.docx','archive.pst','backup.vmdk'];
+  const session=crypto.getRandomValues(new Uint8Array(32));
+  let o='', blobs=[];
+  for(const n of names){
+    const fileKey = mode==='session' ? session : crypto.getRandomValues(new Uint8Array(32));
+    // stand-in for a wrapped key: a deterministic transform of the file key
+    const wrapped = hex(await crypto.subtle.digest('SHA-256', fileKey)).slice(0,32);
+    blobs.push(wrapped);
+    o += (n+'.locked').padEnd(22)+'wrapped key  '+wrapped+'\n';
+  }
+  const uniq=new Set(blobs).size;
+  document.getElementById('s9-out').textContent = o + '\n' +
+    'distinct wrapped blobs: '+uniq+' of '+blobs.length;
+  document.getElementById('s9-stat').innerHTML = mode==='session'
+    ? 'Every blob is <b>identical</b>. One key encrypted all five files, so the same wrapped value '+
+      'is repeated on each. Comparing any two files reveals the model immediately.'
+    : 'Every blob is <b>different</b>. Five files, five keys, five wraps. Nothing is shared between '+
+      'files, so there is nothing to compare across them.';
+}
+document.getElementById('s9-go').addEventListener('click',s9run);
+document.getElementById('s9-mode').addEventListener('change',s9run);
+s9run();
+</script>
+</body>
+</html>

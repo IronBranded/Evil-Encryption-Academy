@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telling them apart — Evil Encryption Academy</title>
+<meta name="description" content="Everything so far, applied backwards. Given an encrypted file and nothing else, what can you work out about the scheme that produced it?">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+</head>
+<body>
+<button class="menu-btn ghost">Menu</button>
+<div class="shell">
+<aside class="side">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<nav>
+  <h4>Foundations</h4>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-symmetric.html" data-p="02"><i>02</i>Symmetric encryption</a>
+  <a href="03-modes.html" data-p="03"><i>03</i>Modes of operation</a>
+  <a href="04-asymmetric.html" data-p="04"><i>04</i>Asymmetric encryption</a>
+  <h4>Ransomware encryption</h4>
+  <a href="05-hybrid.html" data-p="05"><i>05</i>The hybrid scheme</a>
+  <a href="06-coverage.html" data-p="06"><i>06</i>How much gets encrypted</a>
+  <a href="07-key-models.html" data-p="07"><i>07</i>Key models</a>
+  <a href="08-os-native.html" data-p="08"><i>08</i>OS-native encryption</a>
+  <h4>Putting it together</h4>
+  <a href="09-telling-them-apart.html" data-p="09"><i>09</i>Telling them apart</a>
+</nav>
+</aside>
+<main>
+<p class="crumb">Putting it together · 09</p>
+<h1>Telling them apart</h1>
+<p class="lede">Everything so far, applied backwards. Given an encrypted file and nothing else, what can you work out about the scheme that produced it?</p>
+
+<h2>What the output reveals</h2>
+<p>Each design decision leaves a trace in the result. You cannot read the data, but you can often
+describe the scheme quite precisely.</p>
+
+<table>
+<tr><th>Observation</th><th>What it indicates</th></tr>
+<tr><td>Output the same size as the original</td><td>Stream cipher, or a counter-based mode</td></tr>
+<tr><td>Size rounded up to a multiple of 16</td><td>Block cipher with padding — CBC or ECB</td></tr>
+<tr><td>Repeating 16-byte blocks</td><td><strong>ECB.</strong> Structure is leaking</td></tr>
+<tr><td>A consistent extra 16 bytes</td><td>An authentication tag — an AEAD mode</td></tr>
+<tr><td>A 256 or 512-byte high-entropy tail</td><td>An RSA-wrapped key (2048 or 4096-bit)</td></tr>
+<tr><td>A 32-byte tail</td><td>An elliptic-curve public key or shared secret</td></tr>
+<tr><td>Tails identical across files</td><td><strong>Session key</strong> — one key for the host</td></tr>
+<tr><td>Tails all different</td><td><strong>Per-file keys</strong></td></tr>
+<tr><td>Entropy high throughout</td><td>Full encryption</td></tr>
+<tr><td>Entropy high then low</td><td>Header-only</td></tr>
+<tr><td>Entropy alternating</td><td>Intermittent bands</td></tr>
+</table>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · identify the scheme</b><span>five questions</span></div>
+  <div class="sim-body">
+    <p id="s11-q" style="font-weight:600"></p>
+    <div class="out tight" id="s11-ev" style="min-height:90px"></div>
+    <div class="row" id="s11-opts"></div>
+    <div class="out" id="s11-fb" style="min-height:20px"></div>
+    <div class="row"><button id="s11-next">Next question</button>
+      <button class="ghost" id="s11-restart">Start over</button>
+      <span class="stat" id="s11-score"></span></div>
+  </div>
+</div>
+
+<h2>Two traps</h2>
+
+<h3>High entropy does not mean encrypted</h3>
+<p>JPEG images score around 7.9, MP4 video around 8.0, ZIP archives similarly. Compression produces
+evenly distributed bytes for the same reason encryption does. Judging on entropy alone marks every
+photograph and video as encrypted.</p>
+<p>What separates them is <strong>structure</strong>. A JPEG begins with a recognisable header. If a
+file claims to be a JPEG and that header is intact, it is almost certainly just a photograph. If
+the header is gone and the body is high-entropy, something has been done to it.</p>
+
+<h3>High entropy does not mean secure</h3>
+<p>AES-ECB scores near the maximum and leaks the picture straight through, as you saw in
+<a href="03-modes.html">module 03</a>. Entropy measures how evenly bytes are distributed. It cannot
+see repetition at block level, which is precisely what breaks ECB. The measurement that catches it
+is distinct block count, not entropy.</p>
+
+<div class="note">
+<p><b>The habit worth forming.</b> Entropy is one measurement among several, and on its own it is
+the weakest of them. Size relationships, block repetition, header integrity and the shape of any
+trailing data each say something entropy cannot.</p>
+</div>
+
+<h2>Where to go next</h2>
+<p>You now have the concepts. If you want the underlying cryptography in more depth, the standard
+references are <em>Serious Cryptography</em> by Jean-Philippe Aumasson for the algorithms themselves,
+and the published threat intelligence writeups from vendors for how specific families combine them.</p>
+
+<div class="pager"><a href="08-os-native.html"><em>Previous</em>OS-native encryption</a><span></span></div>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="09"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+const Q=[
+ {q:'A file is 40,960 bytes. The original was 40,953 bytes. What does the size tell you?',
+  e:'original    40,953 bytes\nencrypted   40,960 bytes\ndifference       +7 bytes\n\n40,960 ÷ 16 = 2,560 exactly',
+  o:['A stream cipher','A block cipher with padding','An authentication tag','Header-only encryption'],
+  a:1,
+  why:'The output is an exact multiple of 16 and grew by just enough to reach it. That is block '+
+      'padding — CBC or ECB. A stream cipher would have left the size unchanged.'},
+ {q:'Scanning the ciphertext, the same 16 bytes appear 340 times. What does that mean?',
+  e:'block 0x0000  a3 f1 09 7c 22 be 40 15 …\nblock 0x0110  a3 f1 09 7c 22 be 40 15 …  ← identical\nblock 0x0230  a3 f1 09 7c 22 be 40 15 …  ← identical\n\n340 repeats of one block',
+  o:['Normal for any cipher','The file was encrypted twice','ECB mode','A corrupted file'],
+  a:2,
+  why:'Identical ciphertext blocks mean identical plaintext blocks. Only ECB has that property, '+
+      'because it encrypts each block independently. Structure is leaking.'},
+ {q:'Five encrypted files each end with a 32-byte high-entropy tail, and all five tails differ. What is the key model?',
+  e:'invoice.locked   tail 3f8a…c412   (32 bytes)\nledger.locked    tail 91b0…7ee3   (32 bytes)\ncontract.locked  tail 04dd…a180   (32 bytes)\n\nall distinct',
+  o:['One session key for the host','Per-file keys','No encryption key at all','RSA-4096 wrapping'],
+  a:1,
+  why:'Different tails mean different key material per file. The 32-byte size points to elliptic '+
+      'curve rather than RSA — an RSA-wrapped key would be 256 or 512 bytes.'},
+ {q:'A file scores 7.98 entropy. Its name ends .jpg and it starts with FF D8 FF E0 … JFIF. Encrypted?',
+  e:'entropy   7.98 / 8.000\nheader    ff d8 ff e0 00 10 4a 46 49 46   |......JFIF|\nname      holiday.jpg',
+  o:['Yes — the entropy is very high','No — the header is intact and matches','Cannot tell from this','Only the header is encrypted'],
+  a:1,
+  why:'JPEG is compressed, so high entropy is expected and normal. The JFIF header is present and '+
+      'matches the extension. This is simply a photograph.'},
+ {q:'Entropy measured across a large file alternates: high, low, high, low, evenly throughout. Which pattern?',
+  e:'entropy profile, per slice\n\n████····████····████····████····████····████····\n\nhigh ≈ 7.9   low ≈ 4.2',
+  o:['Full encryption','Header-only','Intermittent bands','Distributed chunks'],
+  a:2,
+  why:'Regular alternation throughout is intermittent encryption. Header-only would be high at the '+
+      'start then flat. Distributed chunks would show high regions only at the start, middle and end.'}
+];
+let qi=0, score=0, answered=false;
+function s11draw(){
+  const q=Q[qi];
+  document.getElementById('s11-q').textContent='Question '+(qi+1)+' of '+Q.length+' — '+q.q;
+  document.getElementById('s11-ev').textContent=q.e;
+  const box=document.getElementById('s11-opts'); box.innerHTML='';
+  q.o.forEach((t,i)=>{
+    const b=document.createElement('button'); b.className='ghost'; b.textContent=t;
+    b.addEventListener('click',()=>{
+      if(answered) return; answered=true;
+      const ok=(i===q.a);
+      if(ok) score++;
+      document.getElementById('s11-fb').innerHTML =
+        (ok?'<b class="c-plain">Correct.</b> ':'<b class="c-cipher">Not quite.</b> The answer is “'+q.o[q.a]+'”. ')+q.why;
+      document.getElementById('s11-score').textContent='score '+score+' / '+Q.length;
+    });
+    box.appendChild(b);
+  });
+  document.getElementById('s11-fb').textContent='';
+  answered=false;
+}
+document.getElementById('s11-next').addEventListener('click',()=>{
+  if(qi<Q.length-1){ qi++; s11draw(); }
+  else { document.getElementById('s11-fb').innerHTML =
+    '<b>Finished.</b> Final score '+score+' of '+Q.length+
+    '. Every one of these was answerable from the output alone — no key, no sample, no tooling.'; }
+});
+document.getElementById('s11-restart').addEventListener('click',()=>{ qi=0;score=0;s11draw();
+  document.getElementById('s11-score').textContent=''; });
+s11draw();
+</script>
+</body>
+</html>

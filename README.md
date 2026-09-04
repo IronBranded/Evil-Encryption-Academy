@@ -15,13 +15,6 @@
 Companion repository to [Malware-Analysis-Academy](https://github.com/IronBranded/Malware-Analysis-Academy).
 
 ---
-<h3 align="center">
-  <a href="https://ironbranded.github.io/Evil-Encryption-Academy/" target="_blank" rel="noopener noreferrer">
-    🟢 TRY THE ACADEMY🟢
-  </a>
-</h3>
-
----
 
 ## What this is
 

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How much gets encrypted — Evil Encryption Academy</title>
+<meta name="description" content="Encrypting an entire file server takes hours. Breaking every file on it takes minutes. Modern families exploit that difference, and it produces four distin">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+</head>
+<body>
+<button class="menu-btn ghost">Menu</button>
+<div class="shell">
+<aside class="side">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<nav>
+  <h4>Foundations</h4>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-symmetric.html" data-p="02"><i>02</i>Symmetric encryption</a>
+  <a href="03-modes.html" data-p="03"><i>03</i>Modes of operation</a>
+  <a href="04-asymmetric.html" data-p="04"><i>04</i>Asymmetric encryption</a>
+  <h4>Ransomware encryption</h4>
+  <a href="05-hybrid.html" data-p="05"><i>05</i>The hybrid scheme</a>
+  <a href="06-coverage.html" data-p="06"><i>06</i>How much gets encrypted</a>
+  <a href="07-key-models.html" data-p="07"><i>07</i>Key models</a>
+  <a href="08-os-native.html" data-p="08"><i>08</i>OS-native encryption</a>
+  <h4>Putting it together</h4>
+  <a href="09-telling-them-apart.html" data-p="09"><i>09</i>Telling them apart</a>
+</nav>
+</aside>
+<main>
+<p class="crumb">Ransomware encryption · 06</p>
+<h1>How much gets encrypted</h1>
+<p class="lede">Encrypting an entire file server takes hours. Breaking every file on it takes minutes. Modern families exploit that difference, and it produces four distinct patterns you can see directly.</p>
+
+<h2>The insight being exploited</h2>
+<p>You do not need to encrypt a file to make it unusable. You need to break its <em>structure</em>.
+A database with its header and a few interior pages scrambled will not mount. A VM disk with its
+descriptor damaged will not boot. The remaining bytes are irrelevant to whether the file opens.</p>
+<p>So families encrypt less, and finish faster. This is a speed optimisation, and it produces four
+recognisable coverage patterns.</p>
+
+<h2>The four patterns</h2>
+<table>
+<tr><th>Pattern</th><th>What is encrypted</th><th>Why it is chosen</th></tr>
+<tr><td><strong>Full</strong></td><td>Every byte</td><td>Simple, thorough, slow on large files</td></tr>
+<tr><td><strong>Header-only</strong></td><td>The first few kilobytes</td><td>Fastest possible; most formats die without a header</td></tr>
+<tr><td><strong>Intermittent</strong></td><td>Alternating bands throughout</td><td>Damage spread evenly at a fraction of the I/O</td></tr>
+<tr><td><strong>Distributed chunks</strong></td><td>Regions at the start, middle and end</td><td>Hits header, index and trailer structures specifically</td></tr>
+</table>
+
+<p>A single incident frequently shows <strong>two patterns at once</strong>, split by file size.
+Fast modes usually apply only above a threshold — often 1 MB — because the bookkeeping is not
+worth it on a small file. So small documents get fully encrypted while large databases get a few
+percent.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · coverage explorer</b><span>real AES on the encrypted regions</span></div>
+  <div class="sim-body">
+    <div class="row">
+      <label>Pattern</label>
+      <select id="s8-mode">
+        <option value="full">Full encryption</option>
+        <option value="header">Header-only</option>
+        <option value="inter" selected>Intermittent bands</option>
+        <option value="chunk">Distributed chunks</option>
+      </select>
+      <label>Coverage</label><input type="range" id="s8-pct" min="1" max="100" value="20" style="flex:1">
+      <span class="stat" id="s8-pctv"></span>
+    </div>
+    <p class="stat">File map — each cell is a slice of the file</p>
+    <div class="out tight" id="s8-map" style="font-size:15px;line-height:1.35"></div>
+    <p class="stat">Entropy profile — measured per slice</p>
+    <div class="out tight" id="s8-prof" style="font-size:15px;line-height:1.35"></div>
+    <p class="stat" id="s8-stat"></p>
+  </div>
+</div>
+
+<h2>Why the pattern is visible at all</h2>
+<p>Encrypted bytes look random; structured bytes do not. Measuring entropy across a file in slices
+produces a profile, and each coverage pattern draws a different shape:</p>
+<div class="out tight">FULL                ████████████████████████████████████████████████
+
+HEADER-ONLY         ████········································
+
+INTERMITTENT        ████····████····████····████····████····████····
+
+DISTRIBUTED CHUNKS  ██··························██··························██</div>
+
+<div class="note">
+<p><b>A trap worth knowing.</b> High entropy does not mean encrypted. JPEG, MP4 and ZIP files all
+score near the maximum because compression also produces evenly distributed bytes. Entropy alone
+cannot distinguish ciphertext from a photograph — module 09 covers what actually can.</p>
+</div>
+
+<h2>Fine striping</h2>
+<p>Some families take this further, encrypting very small blocks — 512 bytes — at computed
+intervals across the whole file. The effect is that damage is spread everywhere while total
+coverage stays low.</p>
+<p>This matters for identification because a coarse measurement misses it entirely. If you sample
+entropy in 4 KB windows and each window is 512 encrypted bytes among 3,584 plaintext ones, every
+window reads as mostly plaintext, and the file appears untouched. The pattern only appears when
+you measure at a finer resolution than the stripe.</p>
+
+<div class="pager"><a href="05-hybrid.html"><em>Previous</em>The hybrid scheme</a><a class="nxt" href="07-key-models.html"><em>Next</em>Key models</a></div>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="06"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+async function s8run(){
+  const mode=document.getElementById('s8-mode').value;
+  const pct=+document.getElementById('s8-pct').value;
+  document.getElementById('s8-pctv').textContent=pct+'%';
+  const CELLS=48, SLICE=512, N=CELLS*SLICE;
+  const rec=bytes('BEGIN RECORD; customer=ACME; amount=48200.00; status=OPEN; ');
+  const buf=new Uint8Array(N);
+  for(let i=0;i<N;i++) buf[i]=rec[i%rec.length];
+  const cells=Math.max(1,Math.round(CELLS*pct/100));
+  const encIdx=new Set();
+  if(mode==='full'){ for(let i=0;i<CELLS;i++) encIdx.add(i); }
+  else if(mode==='header'){ for(let i=0;i<cells;i++) encIdx.add(i); }
+  else if(mode==='inter'){ const step=Math.max(1,Math.round(CELLS/cells));
+    for(let i=0;i<CELLS;i+=step) encIdx.add(i); }
+  else { const per=Math.max(1,Math.round(cells/3));
+    for(let i=0;i<per;i++){ encIdx.add(i); encIdx.add(Math.floor(CELLS/2)+i); encIdx.add(CELLS-1-i); } }
+  const k=await demoKeyBytes('module-06');
+  for(const i of encIdx){
+    if(i<0||i>=CELLS) continue;
+    const ct=await aesCBC(buf.slice(i*SLICE,(i+1)*SLICE),k,new Uint8Array(16));
+    buf.set(ct.slice(0,SLICE), i*SLICE);
+  }
+  let map='',prof='';
+  const bars=' ▁▂▃▄▅▆▇█';
+  for(let i=0;i<CELLS;i++){
+    map += encIdx.has(i) ? '█' : '·';
+    const e=shannon(buf.slice(i*SLICE,(i+1)*SLICE))/8;
+    prof += bars[Math.min(bars.length-1,Math.round(e*(bars.length-1)))];
+  }
+  document.getElementById('s8-map').innerHTML =
+    '<span class="c-cipher">'+map.replace(/·/g,'</span><span class="c-plain">·</span><span class="c-cipher">')+'</span>';
+  document.getElementById('s8-prof').textContent = prof;
+  const encBytes=encIdx.size*SLICE;
+  document.getElementById('s8-stat').textContent =
+    'encrypted '+encIdx.size+' of '+CELLS+' slices  ('+(encBytes/N*100).toFixed(1)+'% of the file)'+
+    '   ·   overall entropy '+shannon(buf).toFixed(3)+' / 8.000';
+}
+['s8-mode','s8-pct'].forEach(id=>document.getElementById(id).addEventListener('input',s8run));
+s8run();
+</script>
+</body>
+</html>
