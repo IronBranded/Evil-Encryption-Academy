@@ -1,0 +1,31 @@
+# Lab and test output — never commit generated specimens
+lab-samples/
+specimens/
+incident-*/
+canaries.json
+*.strings.txt
+recovered.*
+
+# Malware samples must NEVER be committed. See labs/SAMPLE_SOURCING.md
+*.exe
+*.dll
+*.sys
+*.vmem
+*.vmss
+*.raw
+*.dmp
+*.mem
+samples/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

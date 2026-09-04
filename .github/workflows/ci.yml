@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tools/requirements.txt
+
+      - name: Run regression tests
+        run: python -m unittest discover tests -v
+
+      - name: Smoke-test the teaching demos
+        run: |
+          python 01-Symmetric-Cryptography/labs/encryption_demo.py all
+          python 01-Symmetric-Cryptography/labs/encryption_demo.py specimens --outdir /tmp/specimens --force
+          python 02-Hybrid-Encryption-Model/labs/parse_footer.py /tmp/specimens --recurse
+          python tools/identify_crypto.py 02-Hybrid-Encryption-Model/labs/parse_footer.py
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Byte-compile all tooling
+        run: python -m compileall -q tools tests 01-Symmetric-Cryptography 02-Hybrid-Encryption-Model
+
+      - name: Repository integrity
+        run: |
+          python -m unittest tests.test_tools.TestRepositoryIntegrity -v

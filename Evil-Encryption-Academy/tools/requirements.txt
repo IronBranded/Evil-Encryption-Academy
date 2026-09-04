@@ -1,0 +1,7 @@
+# Evil-Encryption-Academy tooling dependencies.
+#
+# parse_footer.py and identify_crypto.py are STDLIB ONLY by design, so they run
+# on a locked-down forensic workstation with no package installs. Only the
+# teaching demo needs a third-party library.
+
+cryptography>=42.0        # AES primitives for 01-Symmetric-Cryptography/labs/encryption_demo.py

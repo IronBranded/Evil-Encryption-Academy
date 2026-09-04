@@ -1,0 +1,118 @@
+# Anti-recovery behaviour: the earliest reliable ransomware signals.
+#
+# These usually fire MINUTES BEFORE bulk encryption, which makes them the
+# highest-value blocking opportunity available. File-volume and entropy
+# detection needs EDR telemetry; these work from event logs alone.
+#
+# Reference: 11-Endpoint-Detection/README.md
+
+title: Shadow Copy Deletion via Native Tooling
+id: 8b1c9f42-0e3a-4a71-9c2d-3f7b1a6e5d40
+status: stable
+description: Deletion of volume shadow copies, a near-universal ransomware precursor
+references:
+  - https://www.microsoft.com/en-us/security/blog/threat-intelligence/ransomware/
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  vssadmin:
+    Image|endswith: '\vssadmin.exe'
+    CommandLine|contains|all: ['delete', 'shadows']
+  wmic:
+    Image|endswith: '\wmic.exe'
+    CommandLine|contains: 'shadowcopy'
+    CommandLine|contains: 'delete'
+  powershell:
+    CommandLine|contains|all: ['Win32_ShadowCopy', 'Delete']
+  condition: 1 of them
+falsepositives:
+  - Storage maintenance scripts. Rare, and should be individually allow-listed.
+level: high
+---
+title: Backup and Recovery Destruction
+id: c4d7e219-6b85-4f13-8a90-2e5c7d1b4a63
+status: stable
+description: Backup catalog deletion or recovery environment disabling
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  wbadmin:
+    Image|endswith: '\wbadmin.exe'
+    CommandLine|contains|all: ['delete', 'catalog']
+  bcdedit_recovery:
+    Image|endswith: '\bcdedit.exe'
+    CommandLine|contains: 'recoveryenabled'
+    CommandLine|contains: 'no'
+  bcdedit_failure:
+    Image|endswith: '\bcdedit.exe'
+    CommandLine|contains: 'ignoreallfailures'
+  condition: 1 of them
+falsepositives:
+  - Legitimate backup rotation, which should originate from a known scheduler.
+level: high
+---
+title: Event Logging Disabled via WINEVT Channel Registry
+id: 3f8a1d75-9c04-4e26-b783-1a5d90c4e2f8
+status: experimental
+description: >
+  Disabling future event logging by setting Enabled to 0 under WINEVT\Channels.
+  This goes beyond clearing logs - no new events are recorded afterwards.
+  Observed in DeadLock ransomware (MSTIC, August 2026).
+references:
+  - https://www.microsoft.com/en-us/security/blog/2026/08/10/deadlock-ransomware-breaking-down-a-rust-based-encryptor-with-decentralized-recovery-infrastructure/
+logsource:
+  category: registry_set
+  product: windows
+detection:
+  selection:
+    TargetObject|contains: '\CurrentVersion\WINEVT\Channels\'
+    TargetObject|endswith: '\Enabled'
+    Details: 'DWORD (0x00000000)'
+  condition: selection
+falsepositives:
+  - Deliberate administrative reduction of log noise. Should be rare and documented.
+level: critical
+---
+title: Ransom Note Written Across Multiple Directories
+id: f2a8b031-5c47-4d92-b1e6-9a3f8c2d7e51
+status: experimental
+description: Same filename created repeatedly across directories by one process
+logsource:
+  category: file_event
+  product: windows
+detection:
+  selection:
+    TargetFilename|endswith: ['.txt', '.hta', '.html']
+    TargetFilename|contains:
+      - 'README'
+      - 'RECOVER'
+      - 'DECRYPT'
+      - 'RESTORE'
+      - 'HOW_TO'
+      - 'HOW_RECOVER'
+  condition: selection
+  timeframe: 5m
+falsepositives:
+  - Software installers writing README files. Correlate on directory count.
+level: medium
+---
+title: Canary File Modified
+id: 7e5d3c98-1a62-4b80-9f45-6c8e2d0a3b71
+status: stable
+description: >
+  Write to a deployed decoy file. No legitimate process touches these, so this
+  is the one non-statistical ransomware signal available.
+logsource:
+  category: file_event
+  product: windows
+detection:
+  selection:
+    TargetFilename|contains:
+      - '!!!-DO-NOT-MODIFY-'
+      - '!!-archive-index-'
+  condition: selection
+falsepositives:
+  - Backup software, if canary paths were not excluded from backup jobs.
+level: critical
