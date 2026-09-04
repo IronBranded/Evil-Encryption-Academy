@@ -1,5 +1,7 @@
 # Evil Encryption Academy
 
+**[→ ironbranded.github.io/Evil-Encryption-Academy](https://ironbranded.github.io/Evil-Encryption-Academy/)**
+
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 ![Focus](https://img.shields.io/badge/focus-DFIR%20%7C%20Reverse%20Engineering-red.svg)
@@ -13,14 +15,6 @@
 Companion repository to [Malware-Analysis-Academy](https://github.com/IronBranded/Malware-Analysis-Academy).
 
 ---
-
-<h3 align="center">
-  <a href="https://ironbranded.github.io/Evil-Encryption-Academy/" target="_blank" rel="noopener noreferrer">
-    🟢 TRY THE ACADEMY🟢
-  </a>
-</h3>
-
---
 
 ## What this is
 
