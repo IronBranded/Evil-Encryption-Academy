@@ -14,6 +14,14 @@ Companion repository to [Malware-Analysis-Academy](https://github.com/IronBrande
 
 ---
 
+<h3 align="center">
+  <a href="https://ironbranded.github.io/Evil-Encryption-Academy/" target="_blank" rel="noopener noreferrer">
+    🟢 TRY THE ACADEMY🟢
+  </a>
+</h3>
+
+--
+
 ## What this is
 
 Ransomware is, at its core, an applied cryptography problem wearing a Windows costume. Most people responding to a ransomware incident have never been taught the cryptography, so they cannot answer the two questions that actually matter to the victim:
