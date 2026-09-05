@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference — Evil Encryption Academy</title>
+<meta name="description" content="Every term, size and constant used across the eleven modules, in one place.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Evil Encryption Academy">
+<meta property="og:title" content="Reference">
+<meta property="og:description" content="Every term, size and constant used across the eleven modules, in one place.">
+<meta property="og:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Reference">
+<meta name="twitter:description" content="Every term, size and constant used across the eleven modules, in one place.">
+<meta name="twitter:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+<script>
+/* Apply the stored theme before first paint so the page never flashes the wrong one. */
+(function(){try{var t=localStorage.getItem('eea-theme');
+if(t&&t!=='system')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<button class="menu-btn ghost" aria-controls="sidenav" aria-expanded="false">Menu</button>
+<div class="shell">
+<aside class="side" id="sidenav">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<div class="prog">
+  <div class="prog-bar"><div class="prog-fill"></div></div>
+  <p class="prog-txt"><span class="prog-count">0 of 11 read</span>
+    <button class="prog-reset" type="button">reset</button></p>
+</div>
+<nav>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <h4>Foundations</h4>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-keys-and-randomness.html" data-p="02"><i>02</i>Keys and randomness</a>
+  <a href="03-hashing-and-integrity.html" data-p="03"><i>03</i>Hashing and integrity</a>
+  <h4>The two families</h4>
+  <a href="04-symmetric.html" data-p="04"><i>04</i>Symmetric encryption</a>
+  <a href="05-modes.html" data-p="05"><i>05</i>Modes of operation</a>
+  <a href="06-asymmetric.html" data-p="06"><i>06</i>Asymmetric encryption</a>
+  <h4>Ransomware encryption</h4>
+  <a href="07-hybrid.html" data-p="07"><i>07</i>The hybrid scheme</a>
+  <a href="08-coverage.html" data-p="08"><i>08</i>How much gets encrypted</a>
+  <a href="09-key-models.html" data-p="09"><i>09</i>Key models</a>
+  <a href="10-os-native.html" data-p="10"><i>10</i>OS-native encryption</a>
+  <h4>Putting it together</h4>
+  <a href="11-telling-them-apart.html" data-p="11"><i>11</i>Telling them apart</a>
+  <a href="reference.html" data-p="ref"><i>—</i>Reference</a>
+</nav>
+<div class="side-foot">
+  <button class="theme-btn" type="button">System theme</button>
+</div>
+</aside>
+<main id="content">
+<p class="crumb"><span>Reference</span><span>4 min read</span></p>
+<h1>Reference</h1>
+<p class="lede">Every term, size and constant used across the eleven modules, in one place.</p>
+
+<h2>Sizes worth memorising</h2>
+<table>
+<tr><th>Value</th><th>Size</th><th>Where it appears</th></tr>
+<tr><td>AES block</td><td>16 bytes</td><td>Padding, block repetition, size arithmetic</td></tr>
+<tr><td>AES-128 / 192 / 256 key</td><td>16 / 24 / 32 bytes</td><td>Module 04</td></tr>
+<tr><td>AES key schedule, expanded</td><td>176 / 208 / 240 bytes</td><td>Module 04</td></tr>
+<tr><td>ChaCha20 key</td><td>32 bytes</td><td>Module 04</td></tr>
+<tr><td>ChaCha20 nonce</td><td>8 or 12 bytes</td><td>Module 04</td></tr>
+<tr><td>XChaCha20 nonce</td><td>24 bytes</td><td>The only thing distinguishing it from ChaCha20</td></tr>
+<tr><td>CBC initialisation vector</td><td>16 bytes</td><td>Module 05</td></tr>
+<tr><td>GCM nonce / tag</td><td>12 / 16 bytes</td><td>Modules 03 and 05</td></tr>
+<tr><td>RSA-2048 ciphertext</td><td>256 bytes</td><td>Wrapped key size, module 11</td></tr>
+<tr><td>RSA-4096 ciphertext</td><td>512 bytes</td><td>Wrapped key size, module 11</td></tr>
+<tr><td>Curve25519 public key</td><td>32 bytes</td><td>Ephemeral key storage, module 09</td></tr>
+<tr><td>SHA-256 output</td><td>32 bytes</td><td>Module 03</td></tr>
+<tr><td>SHA-512 output</td><td>64 bytes</td><td>Module 03</td></tr>
+</table>
+
+<h2>Recognisable constants</h2>
+<p>Cipher implementations must contain these verbatim, because the algorithms require them.</p>
+<table>
+<tr><th>Constant</th><th>Belongs to</th></tr>
+<tr><td><code>63 7c 77 7b f2 6b 6f c5</code></td><td>AES S-box, first bytes</td></tr>
+<tr><td><code>52 09 6a d5 30 36 a5 38</code></td><td>AES inverse S-box — decryption is implemented</td></tr>
+<tr><td><code>expand 32-byte k</code></td><td>ChaCha20 / Salsa20 / XChaCha20</td></tr>
+<tr><td><code>expand 16-byte k</code></td><td>The 128-bit key variant</td></tr>
+<tr><td><code>-----BEGIN PUBLIC KEY-----</code></td><td>A PEM-encoded public key</td></tr>
+</table>
+<p>Their presence proves the algorithm is available, not that it is used. A statically linked
+program may carry an entire cryptographic library of which it calls one function.</p>
+
+<h2>Glossary</h2>
+<table>
+<tr><td><strong>AEAD</strong></td><td>Authenticated Encryption with Associated Data. Encrypts and authenticates in one operation, adding a tag.</td></tr>
+<tr><td><strong>AES</strong></td><td>The standard block cipher. Operates on 16 bytes at a time, with 10 to 14 rounds.</td></tr>
+<tr><td><strong>Avalanche</strong></td><td>The property that one changed input bit alters about half the output bits.</td></tr>
+<tr><td><strong>Block cipher</strong></td><td>A cipher that transforms fixed-size blocks. Needs padding and a mode.</td></tr>
+<tr><td><strong>ChaCha20</strong></td><td>A stream cipher, fast in software with no hardware support.</td></tr>
+<tr><td><strong>Ciphertext</strong></td><td>The output of encryption.</td></tr>
+<tr><td><strong>Collision resistance</strong></td><td>The difficulty of finding two inputs with the same hash.</td></tr>
+<tr><td><strong>CSPRNG</strong></td><td>A random generator whose output cannot be predicted. The correct source for a key.</td></tr>
+<tr><td><strong>Curve25519</strong></td><td>An elliptic curve widely used for key agreement. Keys are 32 bytes.</td></tr>
+<tr><td><strong>Diffie-Hellman</strong></td><td>A method for two parties to derive a shared secret without transmitting it.</td></tr>
+<tr><td><strong>ECB</strong></td><td>A mode that encrypts each block independently. Leaks structure; never use it.</td></tr>
+<tr><td><strong>ECDH</strong></td><td>Diffie-Hellman using elliptic curves.</td></tr>
+<tr><td><strong>Entropy</strong></td><td>A measure of how evenly byte values are distributed, from 0 to 8.</td></tr>
+<tr><td><strong>Ephemeral key</strong></td><td>A key generated for a single use and then discarded.</td></tr>
+<tr><td><strong>FVEK</strong></td><td>Full Volume Encryption Key — encrypts the data in full-disk encryption.</td></tr>
+<tr><td><strong>Hash</strong></td><td>A one-way fixed-size fingerprint of data.</td></tr>
+<tr><td><strong>HMAC</strong></td><td>A keyed fingerprint. Proves integrity and authenticity together.</td></tr>
+<tr><td><strong>Hybrid encryption</strong></td><td>Bulk-encrypt with a symmetric cipher, then protect that key asymmetrically.</td></tr>
+<tr><td><strong>IV</strong></td><td>Initialisation vector. A non-secret value making each encryption unique.</td></tr>
+<tr><td><strong>KDF</strong></td><td>Key derivation function. Turns a password or secret into a key, deliberately slowly.</td></tr>
+<tr><td><strong>Kerckhoffs's principle</strong></td><td>A system should stay secure even if everything but the key is public.</td></tr>
+<tr><td><strong>Key schedule</strong></td><td>The expansion of a key into per-round keys inside a block cipher.</td></tr>
+<tr><td><strong>MAC</strong></td><td>Message Authentication Code. A fingerprint only a key holder can produce.</td></tr>
+<tr><td><strong>Mode of operation</strong></td><td>How a block cipher handles data longer than one block.</td></tr>
+<tr><td><strong>Nonce</strong></td><td>A number used once. Must never repeat under the same key.</td></tr>
+<tr><td><strong>OAEP</strong></td><td>The modern padding scheme for RSA encryption.</td></tr>
+<tr><td><strong>Padding</strong></td><td>Bytes added to fill the final block of a block cipher.</td></tr>
+<tr><td><strong>Per-file key</strong></td><td>A fresh symmetric key for every file encrypted.</td></tr>
+<tr><td><strong>Plaintext</strong></td><td>The original readable data.</td></tr>
+<tr><td><strong>Protector</strong></td><td>In full-disk encryption, a method of unlocking the volume master key.</td></tr>
+<tr><td><strong>RSA</strong></td><td>An asymmetric algorithm based on the difficulty of factoring.</td></tr>
+<tr><td><strong>S-box</strong></td><td>The substitution table inside AES. A fixed public constant.</td></tr>
+<tr><td><strong>Salt</strong></td><td>A random value mixed into key derivation so identical passwords yield different keys.</td></tr>
+<tr><td><strong>Session key</strong></td><td>One symmetric key used for an entire host or session.</td></tr>
+<tr><td><strong>Stream cipher</strong></td><td>A cipher producing a keystream XORed with the data. No padding.</td></tr>
+<tr><td><strong>Symmetric / asymmetric</strong></td><td>One key for both directions, or a public and private pair.</td></tr>
+<tr><td><strong>Tag</strong></td><td>The authentication value produced by an AEAD mode. Usually 16 bytes.</td></tr>
+<tr><td><strong>VMK</strong></td><td>Volume Master Key — encrypts the FVEK and is guarded by protectors.</td></tr>
+<tr><td><strong>XOR</strong></td><td>The bitwise operation underlying every cipher here. Its own inverse.</td></tr>
+<tr><td><strong>XTS</strong></td><td>A mode designed for disk sectors. Used by BitLocker.</td></tr>
+</table>
+
+<h2>Things that are commonly stated and are wrong</h2>
+<table>
+<tr><th>Claim</th><th>Why it is wrong</th></tr>
+<tr><td>"High entropy means it is encrypted"</td><td>Compressed formats score the same. Check structure instead.</td></tr>
+<tr><td>"High entropy means it is secure"</td><td>AES-ECB scores high and leaks the plaintext.</td></tr>
+<tr><td>"Random data always scores 8.0"</td><td>Only in large samples. 128 bytes tops out near 6.55.</td></tr>
+<tr><td>"Encrypted files are damaged"</td><td>They are intact. The transformation is reversible with the key.</td></tr>
+<tr><td>"We can brute-force the key"</td><td>Above 128 bits the search is physically impossible.</td></tr>
+<tr><td>"A zero nonce is always a bug"</td><td>Not when the key never repeats. See module 09.</td></tr>
+<tr><td>"RSA-4048"</td><td>Not a real key size. Real ones are 1024, 2048, 3072 and 4096.</td></tr>
+<tr><td>"Knowing the algorithm helps decrypt it"</td><td>Every algorithm here is public. The key is the secret.</td></tr>
+</table>
+
+
+<div class="pager"><a href="11-telling-them-apart.html"><em>Previous</em>Telling them apart</a><span></span></div>
+<p class="kbd-hint">Use <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> to move between modules</p>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="ref"]');if(l)l.classList.add('on');})();
+</script>
+
+</body>
+</html>

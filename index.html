@@ -4,87 +4,177 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Encryption, and how ransomware uses it — Evil Encryption Academy</title>
-<meta name="description" content="Ransomware is an applied cryptography problem wearing a Windows costume. This site explains the encryption itself: the types, how each one works, how ranso">
+<meta name="description" content="Ransomware is an applied cryptography problem wearing a Windows costume. This site explains the encryption itself — the types, how each works, how ransomwa">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Evil Encryption Academy">
+<meta property="og:title" content="Encryption, and how ransomware uses it">
+<meta property="og:description" content="Ransomware is an applied cryptography problem wearing a Windows costume. This site explains the encryption itself — the types, how each works, how ransomwa">
+<meta property="og:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Encryption, and how ransomware uses it">
+<meta name="twitter:description" content="Ransomware is an applied cryptography problem wearing a Windows costume. This site explains the encryption itself — the types, how each works, how ransomwa">
+<meta name="twitter:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/academy.css">
+<script>
+/* Apply the stored theme before first paint so the page never flashes the wrong one. */
+(function(){try{var t=localStorage.getItem('eea-theme');
+if(t&&t!=='system')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
 </head>
 <body>
-<button class="menu-btn ghost">Menu</button>
+<a class="skip" href="#content">Skip to content</a>
+<button class="menu-btn ghost" aria-controls="sidenav" aria-expanded="false">Menu</button>
 <div class="shell">
-<aside class="side">
+<aside class="side" id="sidenav">
 <a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<div class="prog">
+  <div class="prog-bar"><div class="prog-fill"></div></div>
+  <p class="prog-txt"><span class="prog-count">0 of 11 read</span>
+    <button class="prog-reset" type="button">reset</button></p>
+</div>
 <nav>
-  <h4>Foundations</h4>
   <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <h4>Foundations</h4>
   <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
-  <a href="02-symmetric.html" data-p="02"><i>02</i>Symmetric encryption</a>
-  <a href="03-modes.html" data-p="03"><i>03</i>Modes of operation</a>
-  <a href="04-asymmetric.html" data-p="04"><i>04</i>Asymmetric encryption</a>
+  <a href="02-keys-and-randomness.html" data-p="02"><i>02</i>Keys and randomness</a>
+  <a href="03-hashing-and-integrity.html" data-p="03"><i>03</i>Hashing and integrity</a>
+  <h4>The two families</h4>
+  <a href="04-symmetric.html" data-p="04"><i>04</i>Symmetric encryption</a>
+  <a href="05-modes.html" data-p="05"><i>05</i>Modes of operation</a>
+  <a href="06-asymmetric.html" data-p="06"><i>06</i>Asymmetric encryption</a>
   <h4>Ransomware encryption</h4>
-  <a href="05-hybrid.html" data-p="05"><i>05</i>The hybrid scheme</a>
-  <a href="06-coverage.html" data-p="06"><i>06</i>How much gets encrypted</a>
-  <a href="07-key-models.html" data-p="07"><i>07</i>Key models</a>
-  <a href="08-os-native.html" data-p="08"><i>08</i>OS-native encryption</a>
+  <a href="07-hybrid.html" data-p="07"><i>07</i>The hybrid scheme</a>
+  <a href="08-coverage.html" data-p="08"><i>08</i>How much gets encrypted</a>
+  <a href="09-key-models.html" data-p="09"><i>09</i>Key models</a>
+  <a href="10-os-native.html" data-p="10"><i>10</i>OS-native encryption</a>
   <h4>Putting it together</h4>
-  <a href="09-telling-them-apart.html" data-p="09"><i>09</i>Telling them apart</a>
+  <a href="11-telling-them-apart.html" data-p="11"><i>11</i>Telling them apart</a>
+  <a href="reference.html" data-p="ref"><i>—</i>Reference</a>
 </nav>
+<div class="side-foot">
+  <button class="theme-btn" type="button">System theme</button>
+</div>
 </aside>
-<main>
-<p class="crumb">Evil Encryption Academy</p>
+<main id="content">
+<p class="crumb"><span>Evil Encryption Academy</span><span>3 min read</span></p>
 <h1>Encryption, and how ransomware uses it</h1>
-<p class="lede">Ransomware is an applied cryptography problem wearing a Windows costume. This site explains the encryption itself: the types, how each one works, how ransomware combines them, and how to tell the schemes apart. Every page has a working simulation.</p>
+<p class="lede">Ransomware is an applied cryptography problem wearing a Windows costume. This site explains the encryption itself — the types, how each works, how ransomware combines them, and how to tell the schemes apart. Eleven modules, each with a working simulation.</p>
+
+<div class="hero-vis">
+  <div><canvas id="h-src" width="150" height="112" aria-hidden="true"></canvas>
+    <p class="cap">original</p></div>
+  <div><canvas id="h-ecb" width="150" height="112" aria-hidden="true"></canvas>
+    <p class="cap c-cipher">AES-ECB — leaks</p></div>
+  <div><canvas id="h-cbc" width="150" height="112" aria-hidden="true"></canvas>
+    <p class="cap c-plain">AES-CBC — opaque</p></div>
+</div>
+<p class="stat" id="h-desc">The same image under real AES-256, twice, with the same key. Only the
+mode differs — and one of them leaves the picture perfectly readable.</p>
+<p class="sr" id="h-a11y" role="status"></p>
 
 <h2>Why encryption is the whole story</h2>
-<p>Strip away the delivery, the extortion and the branding, and every ransomware family reduces
-to a handful of cryptographic decisions: which cipher encrypts the data, which one protects the
-key, how much of each file gets touched, and whether one key or many are used.</p>
-<p>Those four decisions determine everything a defender can observe and everything a victim
-experiences. Learn them and the families stop looking like a hundred different threats and start
-looking like a small number of recurring designs.</p>
+<p>Strip away the delivery, the extortion and the branding, and every ransomware family reduces to
+a handful of cryptographic decisions. Which cipher encrypts the data. Which one protects the key.
+How much of each file gets touched. Whether one key is used or thousands.</p>
+<p>Those four decisions determine everything that can be observed from outside and everything the
+victim experiences. Learn them and the families stop looking like a hundred separate threats and
+start looking like a small number of recurring designs, assembled from parts you can name.</p>
+<p>None of those parts are unusual. The same hybrid construction that locks a file server also
+secures your banking session and signs your software updates. What changes is not the mathematics
+but who holds the key — which is why this site treats encryption as a neutral mechanism and spends
+its time on how the mechanisms fit together.</p>
+
+<h2>How the course is arranged</h2>
+<p>Three groups, building on each other.</p>
+
+<table>
+<tr><th>#</th><th>Module</th><th>The idea</th></tr>
+<tr><td colspan="3"><strong>Foundations</strong> — the vocabulary everything else assumes</td></tr>
+<tr><td>01</td><td><a href="01-what-encryption-is.html">What encryption is</a></td><td>Four operations people confuse, and the one that actually locks something</td></tr>
+<tr><td>02</td><td><a href="02-keys-and-randomness.html">Keys and randomness</a></td><td>Where keys come from, and why that origin decides everything</td></tr>
+<tr><td>03</td><td><a href="03-hashing-and-integrity.html">Hashing and integrity</a></td><td>Proving data has not changed, which is a different problem from hiding it</td></tr>
+<tr><td colspan="3"><strong>The two families</strong> — how the ciphers themselves work</td></tr>
+<tr><td>04</td><td><a href="04-symmetric.html">Symmetric encryption</a></td><td>One key, enormous speed, and the two cipher designs</td></tr>
+<tr><td>05</td><td><a href="05-modes.html">Modes of operation</a></td><td>Where a correct cipher still produces a broken result</td></tr>
+<tr><td>06</td><td><a href="06-asymmetric.html">Asymmetric encryption</a></td><td>Two keys, tiny capacity, and why that is enough</td></tr>
+<tr><td colspan="3"><strong>Ransomware encryption</strong> — how those parts get assembled</td></tr>
+<tr><td>07</td><td><a href="07-hybrid.html">The hybrid scheme</a></td><td>The construction behind essentially every family</td></tr>
+<tr><td>08</td><td><a href="08-coverage.html">How much gets encrypted</a></td><td>Full, header-only, intermittent, chunked</td></tr>
+<tr><td>09</td><td><a href="09-key-models.html">Key models</a></td><td>One key for everything, or one key per file</td></tr>
+<tr><td>10</td><td><a href="10-os-native.html">OS-native encryption</a></td><td>When the operating system does the encrypting</td></tr>
+<tr><td colspan="3"><strong>Putting it together</strong></td></tr>
+<tr><td>11</td><td><a href="11-telling-them-apart.html">Telling them apart</a></td><td>Identifying a scheme from its output alone</td></tr>
+<tr><td>—</td><td><a href="reference.html">Reference</a></td><td>Every term, constant and number in one place</td></tr>
+</table>
 
 <h2>What you will be able to do</h2>
 <ul>
-  <li>Explain the difference between encoding, hashing and encryption, and why only one of them locks anything</li>
-  <li>Describe how AES and ChaCha20 work, and why the mode of operation matters more than the cipher</li>
-  <li>Explain why RSA and elliptic curves cannot encrypt a hard drive, and what they are actually for</li>
-  <li>Describe the hybrid scheme every modern family uses, and why it is so effective</li>
-  <li>Recognise full, header-only, intermittent and chunked encryption from the shape of the result</li>
-  <li>Tell one scheme apart from another using only the encrypted output</li>
+  <li>Explain the difference between encoding, hashing, encryption and signing, and why only one of them hides anything</li>
+  <li>Describe where a key comes from, and why a key derived from a timestamp is a different situation from one drawn from a secure generator</li>
+  <li>Explain what AES and ChaCha20 actually do to bytes, round by round</li>
+  <li>Say why the mode of operation matters more than the choice of cipher, and show a case where a correct cipher leaks the plaintext</li>
+  <li>Explain why RSA and elliptic curves cannot encrypt a hard drive, and what they are genuinely for</li>
+  <li>Describe the hybrid scheme end to end and name every property that makes it effective</li>
+  <li>Recognise full, header-only, intermittent and chunked encryption from the shape of the output</li>
+  <li>Work out a scheme's design from an encrypted file, with no key and no sample of the software</li>
 </ul>
-
-<h2>The path</h2>
-<table>
-<tr><th>#</th><th>Topic</th><th>The idea</th></tr>
-<tr><td>01</td><td><a href="01-what-encryption-is.html">What encryption is</a></td><td>Three things people confuse, and the operation underneath all of them</td></tr>
-<tr><td>02</td><td><a href="02-symmetric.html">Symmetric encryption</a></td><td>One key, enormous speed, and the two cipher families</td></tr>
-<tr><td>03</td><td><a href="03-modes.html">Modes of operation</a></td><td>Where a correct cipher still produces a broken result</td></tr>
-<tr><td>04</td><td><a href="04-asymmetric.html">Asymmetric encryption</a></td><td>Two keys, tiny capacity, and why that is enough</td></tr>
-<tr><td>05</td><td><a href="05-hybrid.html">The hybrid scheme</a></td><td>How the two families combine into the ransomware core</td></tr>
-<tr><td>06</td><td><a href="06-coverage.html">How much gets encrypted</a></td><td>Full, header-only, intermittent, chunked</td></tr>
-<tr><td>07</td><td><a href="07-key-models.html">Key models</a></td><td>One key for everything, or one key per file</td></tr>
-<tr><td>08</td><td><a href="08-os-native.html">OS-native encryption</a></td><td>When the operating system does the encrypting</td></tr>
-<tr><td>09</td><td><a href="09-telling-them-apart.html">Telling them apart</a></td><td>Identifying a scheme from its output alone</td></tr>
-</table>
 
 <div class="note">
 <p><b>Concepts, not operations.</b> This site explains how encryption schemes work and how to
-recognise them. It contains no encryption tooling, no malware, and no operational procedures.
-The simulations run entirely in your browser using the standard Web Crypto API, and the keys
-are printed on screen — nothing here is secret and nothing is irreversible.</p>
+recognise them. It contains no encryption tooling, no malware and no operational procedures. The
+simulations run entirely in your browser using the standard Web Crypto API, and every key is fixed
+and printed on screen — nothing here is secret and nothing is irreversible.</p>
 </div>
 
 <h2>Start</h2>
+<p>The modules assume the ones before them, so the order is the argument. If you already know the
+foundations, module 07 is where the ransomware-specific material begins.</p>
 <p style="margin-top:20px"><a href="01-what-encryption-is.html"><button>Begin with module 01</button></a></p>
 
+
 <div class="pager"><span></span><a class="nxt" href="01-what-encryption-is.html"><em>Next</em>What encryption is</a></div>
+<p class="kbd-hint">Use <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> to move between modules</p>
 </main>
 </div>
 <script src="assets/academy.js"></script>
 <script>
 (function(){var l=document.querySelector('.side a[data-p="index"]');if(l)l.classList.add('on');})();
 </script>
-
+<script>
+async function heroDraw(){
+  const w=150,h=112, dark = isDark();
+  const src=document.getElementById('h-src'); if(!src) return;
+  const sc=src.getContext('2d');
+  const bg = dark ? '#14181C' : '#FCFCFA', fg = dark ? '#E7EAED' : '#191D21';
+  sc.fillStyle=bg; sc.fillRect(0,0,w,h);
+  sc.fillStyle=fg; sc.fillRect(42,50,66,48);
+  sc.lineWidth=10; sc.strokeStyle=fg;
+  sc.beginPath(); sc.arc(75,50,21,Math.PI,0); sc.stroke();
+  sc.fillStyle=bg; sc.beginPath(); sc.arc(75,68,7,0,Math.PI*2); sc.fill();
+  sc.fillRect(71,68,8,18);
+  const img=sc.getImageData(0,0,w,h), n=w*h, pad=(16-(n%16))%16;
+  const gray=new Uint8Array(n+pad);
+  for(let i=0;i<n;i++) gray[i]=img.data[i*4];
+  const k=await demoKeyBytes('hero');
+  const ecb=await aesECB(gray,k), cbc=await aesCBC(gray,k,new Uint8Array(16));
+  const paint=(id,d)=>{const c=document.getElementById(id),x=c.getContext('2d');
+    const o=x.createImageData(w,h);
+    for(let i=0;i<n;i++){o.data[i*4]=o.data[i*4+1]=o.data[i*4+2]=d[i];o.data[i*4+3]=255;}
+    x.putImageData(o,0,0);};
+  paint('h-ecb',ecb); paint('h-cbc',cbc);
+  const total=Math.floor(gray.length/16);
+  describe('h-a11y','Three images. The original shows a padlock. Encrypted with AES in ECB mode '+
+    'the padlock is still clearly visible, because only '+distinctBlocks(ecb)+' of '+total+
+    ' blocks are distinct. Encrypted with AES in CBC mode it is unreadable noise, with all '+
+    distinctBlocks(cbc)+' blocks distinct.');
+}
+heroDraw();
+document.addEventListener('themechange', heroDraw);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', heroDraw);
+</script>
 </body>
 </html>

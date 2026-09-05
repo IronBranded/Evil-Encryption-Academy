@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OS-native encryption — Evil Encryption Academy</title>
+<meta name="description" content="Some families ship no cryptography at all. They switch on the encryption already built into the operating system, which changes the shape of the problem co">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Evil Encryption Academy">
+<meta property="og:title" content="OS-native encryption">
+<meta property="og:description" content="Some families ship no cryptography at all. They switch on the encryption already built into the operating system, which changes the shape of the problem co">
+<meta property="og:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="OS-native encryption">
+<meta name="twitter:description" content="Some families ship no cryptography at all. They switch on the encryption already built into the operating system, which changes the shape of the problem co">
+<meta name="twitter:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+<script>
+/* Apply the stored theme before first paint so the page never flashes the wrong one. */
+(function(){try{var t=localStorage.getItem('eea-theme');
+if(t&&t!=='system')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<button class="menu-btn ghost" aria-controls="sidenav" aria-expanded="false">Menu</button>
+<div class="shell">
+<aside class="side" id="sidenav">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<div class="prog">
+  <div class="prog-bar"><div class="prog-fill"></div></div>
+  <p class="prog-txt"><span class="prog-count">0 of 11 read</span>
+    <button class="prog-reset" type="button">reset</button></p>
+</div>
+<nav>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <h4>Foundations</h4>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-keys-and-randomness.html" data-p="02"><i>02</i>Keys and randomness</a>
+  <a href="03-hashing-and-integrity.html" data-p="03"><i>03</i>Hashing and integrity</a>
+  <h4>The two families</h4>
+  <a href="04-symmetric.html" data-p="04"><i>04</i>Symmetric encryption</a>
+  <a href="05-modes.html" data-p="05"><i>05</i>Modes of operation</a>
+  <a href="06-asymmetric.html" data-p="06"><i>06</i>Asymmetric encryption</a>
+  <h4>Ransomware encryption</h4>
+  <a href="07-hybrid.html" data-p="07"><i>07</i>The hybrid scheme</a>
+  <a href="08-coverage.html" data-p="08"><i>08</i>How much gets encrypted</a>
+  <a href="09-key-models.html" data-p="09"><i>09</i>Key models</a>
+  <a href="10-os-native.html" data-p="10"><i>10</i>OS-native encryption</a>
+  <h4>Putting it together</h4>
+  <a href="11-telling-them-apart.html" data-p="11"><i>11</i>Telling them apart</a>
+  <a href="reference.html" data-p="ref"><i>—</i>Reference</a>
+</nav>
+<div class="side-foot">
+  <button class="theme-btn" type="button">System theme</button>
+</div>
+</aside>
+<main id="content">
+<p class="crumb"><span>Ransomware encryption · 10</span><span>4 min read</span></p>
+<h1>OS-native encryption</h1>
+<p class="lede">Some families ship no cryptography at all. They switch on the encryption already built into the operating system, which changes the shape of the problem completely.</p>
+
+<h2>Encryption without an encryptor</h2>
+<p>Every scheme so far assumes the software contains a cipher. That assumption fails against an
+approach that simply enables the disk encryption the operating system already provides.</p>
+<p>There is no cipher to examine, because the vendor wrote it. The encryption is correct,
+well-tested, and performed by signed system components doing exactly what they were designed to
+do. Nothing is malformed; only the ownership of the key has changed.</p>
+
+<table>
+<tr><th></th><th>Custom encryptor</th><th>OS-native</th></tr>
+<tr><td>Cipher</td><td>Compiled into the software</td><td>Built into the operating system</td></tr>
+<tr><td>Scope</td><td>Files matching a target list</td><td><strong>The entire volume, including the OS</strong></td></tr>
+<tr><td>Victim experience</td><td>Files present but unreadable</td><td><strong>The machine will not boot</strong></td></tr>
+<tr><td>Speed</td><td>Bounded by disk throughput</td><td>Can be near-instant — see below</td></tr>
+<tr><td>What you can examine</td><td>The whole design</td><td>Nothing; it is a documented feature</td></tr>
+</table>
+
+<h2>How full-disk encryption is layered</h2>
+<p>BitLocker is the common example, and its layering is precisely what makes the attack work.
+There are three levels, and the interesting one is in the middle.</p>
+
+<figure role="img" aria-label="Layered diagram: volume data is encrypted by the FVEK, which is encrypted by the VMK, which is protected by one or more protectors such as TPM, TPM plus PIN, a recovery password, or a startup key."><svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg">
+<rect class="box-c" x="180" y="22" width="340" height="42" rx="4"/>
+<text x="350" y="48" text-anchor="middle" font-size="13.5" font-weight="600">Your data on the volume</text>
+<path class="arrow" d="M350 78 v-10" marker-end="url(#ah3)"/>
+<text class="lbl m" x="360" y="88" font-size="11">encrypted with</text>
+<rect class="box-k" x="220" y="98" width="260" height="42" rx="4"/>
+<text x="350" y="118" text-anchor="middle" font-size="13" font-weight="600">FVEK</text>
+<text class="tiny" x="350" y="133" text-anchor="middle">full volume encryption key</text>
+<path class="arrow" d="M350 154 v-10" marker-end="url(#ah3)"/>
+<text class="lbl m" x="360" y="164" font-size="11">encrypted with</text>
+<rect class="box-k" x="220" y="174" width="260" height="42" rx="4" stroke-width="2.6"/>
+<text x="350" y="194" text-anchor="middle" font-size="13" font-weight="600">VMK</text>
+<text class="tiny" x="350" y="209" text-anchor="middle">volume master key</text>
+<text class="m fill-c" x="500" y="200" font-size="12" font-weight="600">← the attack surface</text>
+<path class="arrow" d="M350 236 v-14" marker-end="url(#ah3)"/>
+<text class="lbl m" x="360" y="246" font-size="11">protected by</text>
+<g>
+<rect class="box" x="34" y="262" width="140" height="38" rx="4"/>
+<text x="104" y="286" text-anchor="middle" font-size="12">TPM</text>
+<rect class="box" x="192" y="262" width="140" height="38" rx="4"/>
+<text x="262" y="286" text-anchor="middle" font-size="12">TPM + PIN</text>
+<rect class="box" x="350" y="262" width="140" height="38" rx="4"/>
+<text x="420" y="286" text-anchor="middle" font-size="12">recovery password</text>
+<rect class="box" x="508" y="262" width="140" height="38" rx="4"/>
+<text x="578" y="286" text-anchor="middle" font-size="12">startup key</text>
+</g>
+<path class="arrow" d="M104 258 v-14 h474 v14 M262 258 v-14 M420 258 v-14"/>
+<text class="tiny" x="34" y="330">Changing a protector rewrites only this bottom layer — a few kilobytes.</text>
+<text class="tiny fill-c" x="34" y="348">The volume above it is never re-encrypted, which is why the swap takes seconds.</text>
+<defs><marker id="ah3" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+<path d="M0 0 L7 3.5 L0 7 z" fill="currentColor" class="lbl"/></marker></defs>
+</svg><figcaption>Three layers, and only the bottom one changes during an attack. That is the entire mechanism.</figcaption></figure>
+
+<p>Reading it from the bottom: one or more <strong>protectors</strong> guard the volume master key.
+The VMK in turn encrypts the full volume encryption key, and the FVEK encrypts the data itself.</p>
+
+<h3>The protectors</h3>
+<table>
+<tr><th>Protector</th><th>Unlocks using</th><th>Notes</th></tr>
+<tr><td>TPM</td><td>A hardware chip, automatically at boot</td><td>Transparent to the user</td></tr>
+<tr><td>TPM + PIN</td><td>Hardware plus something typed</td><td>Resists an attacker with physical access</td></tr>
+<tr><td>Recovery password</td><td>A 48-digit number</td><td>The fallback, often escrowed centrally</td></tr>
+<tr><td>Startup key</td><td>A file on removable media</td><td>Used where there is no TPM</td></tr>
+<tr><td>Password</td><td>A passphrase</td><td>Typically for data volumes</td></tr>
+</table>
+
+<h2>Why the swap is instant</h2>
+<p>The volume is <strong>never re-encrypted when protectors change</strong>. Adding or removing a
+protector rewrites only the small layer that guards the VMK — a few kilobytes. The terabytes
+underneath are untouched.</p>
+<p>That is the entire mechanism: <strong>add a protector only the attacker knows, remove the ones
+the owner knows.</strong> The data never moves.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · why swapping protectors is instant</b><span>compare the work done</span></div>
+  <div class="sim-body">
+    <div class="row">
+      <label for="s10-size">Volume size</label>
+      <select id="s10-size">
+        <option value="500">500 GB</option><option value="2000" selected>2 TB</option>
+        <option value="10000">10 TB</option>
+      </select>
+      <label for="s10-mode">Scenario</label>
+      <select id="s10-mode">
+        <option value="custom">Custom encryptor — rewrite every file</option>
+        <option value="fresh">OS encryption from scratch — encrypt the volume</option>
+        <option value="swap" selected>Volume already encrypted — swap the protector</option>
+      </select>
+    </div>
+    <div class="out tight" id="s10-out" style="min-height:130px"></div>
+  </div>
+</div>
+
+<h3>Two very different scenarios</h3>
+<p>The distinction above is often missed, and it changes the picture entirely:</p>
+<ul>
+  <li><strong>The volume is already encrypted.</strong> Only the key-protection layer is rewritten.
+      Seconds of work. No bulk encryption happens at all.</li>
+  <li><strong>The volume is not encrypted.</strong> Encryption must be switched on and a full pass
+      performed, taking as long as any other full-disk encryption — and leaving far more
+      evidence.</li>
+</ul>
+
+<h2>The key escrow question</h2>
+<p>Full-disk encryption in a managed environment is normally configured to escrow its recovery key
+centrally — into a directory service, a device management platform, or a dedicated database. The
+key is held somewhere other than the machine.</p>
+<p>This matters conceptually because it is the one case in this whole course where a copy of the
+key material legitimately exists somewhere the attacker does not control. Everywhere else in the
+hybrid scheme, the only key that opens the data is on the operator's infrastructure by design. Here
+it may not be.</p>
+
+<h2>The broader category</h2>
+<table>
+<tr><th>Mechanism</th><th>Platform</th><th>What gets encrypted</th></tr>
+<tr><td>BitLocker</td><td>Windows</td><td>Whole volumes, including the boot volume</td></tr>
+<tr><td>EFS</td><td>Windows</td><td>Individual files, under a certificate</td></tr>
+<tr><td>LUKS / dm-crypt</td><td>Linux, NAS appliances</td><td>Whole volumes</td></tr>
+<tr><td>Hypervisor VM encryption</td><td>ESXi, vSphere</td><td>Entire virtual machines at once</td></tr>
+<tr><td>Cloud storage encryption</td><td>Object storage</td><td>Objects rewritten under a supplied key</td></tr>
+<tr><td>Archive tools with a password</td><td>Any</td><td>Files packed into an encrypted container</td></tr>
+</table>
+
+<p>The hypervisor case is worth singling out for scale. A single action at that layer encrypts every
+virtual machine on the host simultaneously, which can be hundreds of workloads — without touching
+any of them individually.</p>
+
+<div class="note">
+<p><b>The conceptual point.</b> Encryption is not inherently hostile. The same BitLocker that
+protects a stolen laptop can lock out its owner — nothing about the cryptography changed, only who
+holds the key. That is true of every scheme on this site, and it is why encryption is worth studying
+as a neutral mechanism rather than as a weapon.</p>
+</div>
+
+<div class="done-bar" data-p="10"><p>Finished this module?</p><button type="button" aria-pressed="false">Mark as read</button></div>
+<div class="pager"><a href="09-key-models.html"><em>Previous</em>Key models</a><a class="nxt" href="11-telling-them-apart.html"><em>Next</em>Telling them apart</a></div>
+<p class="kbd-hint">Use <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> to move between modules</p>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="10"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+function s10run(){
+  const gb=+document.getElementById('s10-size').value;
+  const mode=document.getElementById('s10-mode').value;
+  const MBps=800;
+  const fmt=s=>{ if(s<1) return '< 1 second';
+    if(s<60) return s.toFixed(0)+' seconds';
+    if(s<3600) return (s/60).toFixed(1)+' minutes';
+    return (s/3600).toFixed(1)+' hours'; };
+  let o='';
+  if(mode==='custom'){
+    o='Custom encryptor — every file read, encrypted and written back\n'+'─'.repeat(60)+
+      '\n\n  data to process   '+gb+' GB\n  disk throughput   ~'+MBps+' MB/s\n\n'+
+      '  TIME  '+fmt((gb*1024)/MBps)+'\n\n'+
+      'Every byte crosses the disk twice. That is the window in which\nthe activity is visible.';
+  } else if(mode==='fresh'){
+    o='Volume not previously encrypted — full encryption pass required\n'+'─'.repeat(60)+
+      '\n\n  data to process   '+gb+' GB\n  disk throughput   ~'+MBps+' MB/s\n\n'+
+      '  TIME  '+fmt((gb*1024)/MBps)+'\n\n'+
+      'Comparable to the custom encryptor, because the same amount of\ndata must be transformed. '+
+      'Setup work is needed first as well.';
+  } else {
+    o='Volume already encrypted — only the protector is swapped\n'+'─'.repeat(60)+
+      '\n\n  data to process   0 GB          ← the volume is not touched\n'+
+      '  key layer rewritten   a few kilobytes\n\n  TIME  < 1 second\n\n'+
+      'The '+gb+' GB underneath is already encrypted and stays exactly as it\nis. Only the small '+
+      'layer protecting the master key is rewritten.\n\nSame outcome for the owner. Roughly '+
+      fmt((gb*1024)/MBps)+' less work.';
+  }
+  document.getElementById('s10-out').textContent=o;
+}
+['s10-size','s10-mode'].forEach(id=>document.getElementById(id).addEventListener('input',s10run));
+s10run();
+</script>
+</body>
+</html>

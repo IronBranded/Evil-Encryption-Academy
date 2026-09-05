@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#FCFCFA"/>
+  <rect x="0" y="0" width="1200" height="8" fill="#B03A2E"/>
+  <text x="80" y="180" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="30"
+        fill="#8B949E" letter-spacing="1">EVIL ENCRYPTION ACADEMY</text>
+  <text x="80" y="288" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="72"
+        font-weight="700" fill="#191D21">Encryption, and how</text>
+  <text x="80" y="372" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="72"
+        font-weight="700" fill="#191D21">ransomware uses it</text>
+  <text x="80" y="436" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="30"
+        fill="#59636F">Nine modules. A working simulation on every page.</text>
+  <g font-family="IBM Plex Mono, monospace" font-size="44">
+    <text x="80" y="536" fill="#B03A2E">████</text>
+    <text x="196" y="536" fill="#2E6F5E">········</text>
+    <text x="428" y="536" fill="#B03A2E">████</text>
+    <text x="544" y="536" fill="#2E6F5E">········</text>
+    <text x="776" y="536" fill="#B03A2E">████</text>
+    <text x="892" y="536" fill="#2E6F5E">········</text>
+  </g>
+  <text x="80" y="580" font-family="IBM Plex Mono, monospace" font-size="22" fill="#8B949E">
+    encrypted / plaintext — the shape a scheme leaves behind</text>
+</svg>

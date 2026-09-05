@@ -2,6 +2,9 @@
 
 **[→ ironbranded.github.io/Evil-Encryption-Academy](https://ironbranded.github.io/Evil-Encryption-Academy/)**
 
+The site is a self-contained course: 11 modules plus a reference page, each with a working
+simulation that runs real cryptography in the browser. Concepts only — no tooling, no malware.
+
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 ![Focus](https://img.shields.io/badge/focus-DFIR%20%7C%20Reverse%20Engineering-red.svg)

@@ -1,169 +1,119 @@
 Evil-Encryption-Academy/
 #
-#  ✅ written and verified     🧪 partially written     📋 planned, not yet built
-#  Items with no marker are directories whose contents are listed below them.
-#  A test in tests/ enforces that every FILE named here actually exists.
+#  GENERATED FILE — do not edit by hand.
+#  Run  python3 make_structure.py  to regenerate from the actual tree.
 #
-│
-├── README.md                          # Landing page, roadmap, module index
-├── STRUCTURE.txt                      # This file
-├── SCOPE.md                           # What this repo teaches and what it deliberately omits
-├── CONTRIBUTING.md                    # Contribution rules, including the no-weaponization policy
-├── CODE_OF_CONDUCT.md
-├── LICENSE                            # MIT (docs) / see labs/ for per-tool licensing
-├── GLOSSARY.md                        # Crypto + DFIR terminology, noob-facing
-│
+#  The previous hand-written version drifted out of date silently, because the
+#  integrity test only checked that named files existed and never that existing
+#  files were named. Generating it removes that whole class of error.
+#
+├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── technical-correction.md
+│   │   └── tool-bug.md
+│   ├── workflows/
+│   │   └── ci.yml                            Tests on Python 3.9-3.12 plus repository integrity
+│   └── pull_request_template.md
 ├── 00-Foundations/
-│   ├── README.md
-│   ├── 01-bitwise-and-xor/
-│   │   ├── README.md                  # XOR as the atom of every cipher; single-byte XOR breaking
-│   │   └── labs/xor_bruteforce.py   📋
-│   ├── 02-encoding-hashing-encryption/
-│   │   ├── README.md                  # Base64 vs MD5 vs AES: the three things noobs conflate
-│   │   └── labs/identify_transform.py   📋
-│   ├── 03-entropy-analysis/
-│   │   ├── README.md                  # Shannon entropy 0.0-8.0, encrypted vs compressed vs packed
-│   │   └── labs/entropy_scan.py   📋       # Whole-disk / directory entropy sweeper
-│   ├── 04-randomness-and-key-material/
-│   │   ├── README.md                  # CSPRNG vs PRNG, why seeding bugs create decryptors
-│   │   └── case-notes/weak-rng-recoveries.md   📋
-│   └── 05-primes-fields-lite/
-│       └── README.md                  # Just enough number theory to read RSA/ECC writeups
-│
+│   └── README.md                         Repository readme
 ├── 01-Symmetric-Cryptography/
-│   ├── README.md
 │   ├── labs/
-│   │   ├── README.md                  # Walkthrough of all five demos with output
-│   │   └── encryption_demo.py         # Before/after simulator + lab specimen generator
-│   ├── 01-block-ciphers-and-modes/
-│   │   ├── README.md                  # ECB/CBC/CTR/GCM, IV reuse, what each looks like on disk
-│   │   └── labs/mode_fingerprint.py   📋   # Identify mode from ciphertext structure
-│   ├── 02-stream-ciphers/
-│   │   └── README.md                  # RC4, Salsa20, ChaCha20, keystream reuse failures
-│   ├── 03-recognizing-aes-in-binaries/
-│   │   ├── README.md                  # S-box, Te0-Te3 tables, AES-NI instruction patterns
-│   │   └── yara/aes_constants.yar
-│   ├── 04-recognizing-chacha-salsa/
-│   │   ├── README.md                  # "expand 32-byte k" sigma constant, quarter-round shape
-│   │   └── yara/chacha_constants.yar
-│   ├── 05-windows-capi-surface/
-│   │   └── README.md                  # CryptAcquireContext/CryptGenKey/CryptEncrypt recognition
-│   └── 06-windows-cng-surface/
-│       └── README.md                  # BCrypt*/NCrypt* recognition, KSP model
-│
-├── 02-Hybrid-Encryption-Model/        ★ FLAGSHIP MODULE
-│   ├── README.md                      # Full deep-dive: scheme, APIs, recovery window, forensics
-│   ├── diagrams/
-│   │   ├── hybrid-lifecycle.mmd
-│   │   └── file-layout-variants.txt   📋
+│   │   ├── encryption_demo.py
+│   │   └── README.md                         Repository readme
+│   ├── yara/
+│   │   ├── aes_constants.yar
+│   │   └── chacha_constants.yar
+│   └── README.md                         Repository readme
+├── 02-Hybrid-Encryption-Model/
 │   ├── labs/
-│   │   ├── parse_footer.py            # Encrypted-file footer/header triage tool
-│   │   ├── 02-key-schedule-hunt/README.md
-│   │   └── 03-decrypt-harness/README.md   # Apply a RECOVERED key to a victim file
-│   ├── yara/hybrid_crypto_profile.yar
-│   └── sigma/
-│
+│   │   └── parse_footer.py
+│   ├── yara/
+│   │   └── hybrid_crypto_profile.yar
+│   └── README.md                         Repository readme
 ├── 03-Encryption-Paradigms/
-│   ├── README.md
-│   ├── 01-full-vs-intermittent/
-│   │   └── README.md                  # Header-only / spot / stripe: the ENTROPY SIGNATURE of each
-│   ├── 02-per-file-vs-per-session-keys/
-│   │   └── README.md                  # Blast radius of a single recovered key
-│   ├── 03-throughput-artifacts/
-│   │   └── README.md                  # What mass parallel I/O looks like in ETW / USN / perf counters
-│   └── 04-anti-recovery-behaviors/
-│       └── README.md                  # VSS/backup tampering as DETECTION SURFACE (behavioral only)
-│
-├── 04-Platform-And-LOTL-Encryption/    ★ OS-NATIVE ENCRYPTION ABUSE
-│   ├── README.md                      # BitLocker, EFS, FDE tools, cloud, hypervisor
-│   ├── 01-bitlocker-internals/        # FVEK/VMK/protectors, AES-XTS, FVE metadata
-│   ├── 02-bitlocker-abuse/            # ShrinkLocker and predecessors; escrow recovery
-│   ├── 03-efs-and-certificates/       # cipher.exe, $EFS attribute, cert store artifacts
-│   ├── 04-third-party-fde/            # VeraCrypt/DiskCryptor deployed as encryptors
-│   ├── 05-archive-and-cloud/          # 7-Zip/RAR, S3 SSE-C, ESXi/vSphere native
-│   ├── yara/lotl_bitlocker.yar
-│   └── sigma/
-├── 05-Windows-Crypto-Internals/    ✅ WRITTEN - heap layout of keys, the LSASS myth corrected
-│   ├── README.md
-│   ├── 01-capi-vs-cng-architecture/
-│   ├── 02-key-storage-providers/      # KSP/CSP, DPAPI, where key material actually lives
-│   ├── 03-crypto-in-process-memory/   # Heap layout of key handles and expanded schedules
-│   └── 04-syscall-and-driver-layer/
-│       └── README.md                  # Ntdll-direct I/O + BYOVD as an ARTIFACT/detection topic
-│
+│   └── README.md                         Repository readme
+├── 04-Platform-And-LOTL-Encryption/
+│   ├── yara/
+│   │   └── lotl_bitlocker.yar
+│   └── README.md                         Repository readme
+├── 05-Windows-Crypto-Internals/
+│   └── README.md                         Repository readme
 ├── 06-Case-Studies/
-│   ├── README.md                      # How to read a threat-intel writeup critically
-│   ├── the-gentlemen/                 ★ WRITTEN UP - XChaCha20 + per-file Curve25519 ECDH
-│   │   └── README.md                  # Source: MSTIC, May 2026
-│   ├── deadlock/                      # QUEUED - Rust encryptor (MSTIC, Aug 2026)
-│   ├── wannacry/                      # RSA-2048 + AES-128-CBC via CAPI; the killswitch context
-│   ├── ryuk-conti/                    # Hardcoded pubkeys, queueing, leaked-source lessons
-│   ├── lockbit/                       # v2/v3, speed claims vs measured throughput
-│   ├── blackcat-alphv/                # Rust build, ChaCha20-Poly1305 / AES-GCM selection logic
-│   ├── akira/                         # Cross-platform, ESXi variants
-│   └── _template/
-│       ├── README.md                  # timeline, crypto scheme, recoverability verdict
-│       ├── iocs/                       # hashes, extensions, note filenames, mutexes
-│       ├── yara/
-│       ├── sigma/
-│       └── references.md   📋              # primary sources only
-│
+│   ├── _template/
+│   │   └── README.md                         Repository readme
+│   ├── deadlock/
+│   │   └── README.md                         Repository readme
+│   ├── the-gentlemen/
+│   │   └── README.md                         Repository readme
+│   └── README.md                         Repository readme
 ├── 07-Memory-Forensics/
-│   ├── README.md
-│   ├── 01-acquisition-doctrine/
-│   │   └── README.md                  # The "do not reboot" rule and how to argue it to a client
-│   ├── 02-volatility3-workflow/
-│   │   └── README.md                  # pslist, memmap, procdump, malfind on a live encryptor
-│   ├── 03-aes-key-schedule-recovery/
-│   │   └── README.md                  # findaes / bulk_extractor / schedule-relation verification
-│   └── 04-stream-cipher-state-recovery/
-│       └── README.md                  # Why ChaCha20 state is harder than an AES schedule
-│
-├── 08-Reverse-Engineering/         ✅ WRITTEN - Go/Rust, RIFT, constant xref, key origin
-│   ├── README.md
-│   ├── 01-triage-and-imports/         # IAT review, packing detection, static-linked crypto
-│   ├── 02-ghidra-workflow/            # Locating crypto, typing BCRYPT structs, decompiler cleanup
-│   ├── 03-x64dbg-workflow/            # API breakpoints, dumping key buffers at generation time
-│   ├── 04-finding-embedded-pubkeys/   # PEM, DER SPKI, CAPI/CNG blob magics
-│   └── 05-kdf-identification/         # PBKDF2/HKDF/custom, and why KDFs sometimes save victims
-│
-├── 09-Triage-and-IR/               ✅ WRITTEN - $UsnJrnl-first timeline, log-clearing survival
-│   ├── README.md
-│   ├── 01-filesystem-artifacts/       # $MFT, $UsnJrnl:$J, $LogFile, extension/rename patterns
-│   ├── 02-event-logs/                 # 4663, 4688, 7045, 1102, Sysmon 1/11/23
-│   ├── 03-ransom-note-analysis/       # Note provenance, TOR/contact IOCs, family attribution
-│   ├── 04-scoping-the-blast-radius/   # Which shares, which hosts, first-encrypted-file timing
-│   └── 05-reporting-templates/
-│
-├── 10-Recovery-and-Decryption/    ✅ WRITTEN
-│   ├── labs/recover_partial.py     ✅ Surviving-plaintext extraction, offset-preserving
-│   ├── README.md
-│   ├── 01-is-it-recoverable/          # Decision tree: RAM? weak RNG? flawed scheme? backups?
-│   ├── 02-public-decryptors/          # NoMoreRansom, vendor tools, verifying before you run one
-│   ├── 03-partial-file-recovery/      # Intermittent encryption leaves usable plaintext
-│   └── 04-carving-and-shadow-remnants/
-│
-├── 11-Endpoint-Detection/          ✅ WRITTEN - how EDR detects ransomware
-│   ├── README.md                   ✅ Minifilter/ETW telemetry, the signals, correlation, gaps
-│   ├── labs/canary_deploy.py       ✅ Decoy file tripwire, deploy + check + alert
-│   └── sigma/                      ✅ ransomware_precursors.yml (5 rules)
-│
+│   └── README.md                         Repository readme
+├── 08-Reverse-Engineering/
+│   └── README.md                         Repository readme
+├── 09-Triage-and-IR/
+│   ├── templates/
+│   │   └── recoverability-assessment.md
+│   └── README.md                         Repository readme
+├── 10-Recovery-and-Decryption/
+│   ├── labs/
+│   │   └── recover_partial.py
+│   └── README.md                         Repository readme
+├── 11-Endpoint-Detection/
+│   ├── labs/
+│   │   └── canary_deploy.py
+│   ├── sigma/
+│   │   └── ransomware_precursors.yml
+│   └── README.md                         Repository readme
+├── assets/
+│   ├── _nav.html                         Shared sidebar navigation
+│   ├── _page.tmpl
+│   ├── academy.css                       Shared styles including dark mode
+│   ├── academy.js                        Crypto helpers, progress, theme, keyboard navigation
+│   ├── card.svg                          Social preview image
+│   └── favicon.svg                       Site icon
+├── capstone/
+│   ├── generate_incident.py
+│   ├── README.md                         Repository readme
+│   └── SOLUTION.md
 ├── labs/
-│   ├── README.md                   ✅ Read this before touching anything
-│   ├── SAFE_LAB_SETUP.md           ✅ Isolated VM, no NIC, snapshots, host protections
-│   ├── SAMPLE_SOURCING.md          ✅ Where to get samples legally and how to handle them
-│   └── environment/                   # FlareVM / REMnux provisioning notes
-│
+│   ├── README.md                         Repository readme
+│   ├── SAFE_LAB_SETUP.md
+│   └── SAMPLE_SOURCING.md
+├── references/
+│   ├── CIPHER-IDENTIFICATION.md
+│   └── PRIMARY_SOURCES.md
+├── tests/
+│   └── test_tools.py                     Regression tests — every one exists because a bug shipped
 ├── tools/
-│   ├── README.md                   ✅ How the five tools chain in an incident
-│   ├── identify_crypto.py             # Algorithm ID by constants/APIs/container magics
-│   ├── entropy/                       # Shared entropy library used across modules
-│   ├── parsers/                       # Footer/header blob parsers
+│   ├── identify_crypto.py
+│   ├── README.md                         Repository readme
 │   └── requirements.txt
-│
-└── references/
-    ├── CIPHER-IDENTIFICATION.md       # Master catalog: every algorithm + how to ID it
-    ├── PRIMARY_SOURCES.md             # MSTIC, CISA, vendor IR reports
-    ├── MICROSOFT_DOCS.md   📋              # CNG / CAPI API reference index
-    ├── TRAINING.md   📋                    # SANS FOR500/508/509/610/498, 13cubed
-    └── BOOKS.md   📋                       # Windows Internals, Practical Malware Analysis, etc.
+├── .gitignore                        Blocks samples, specimens and generated output
+├── .nojekyll                         Serve GitHub Pages as static files
+├── 01-what-encryption-is.html        Encoding / hashing / signing / encryption; XOR; Kerckhoffs
+├── 02-keys-and-randomness.html       Key size, CSPRNG vs PRNG, KDFs, nonces
+├── 03-hashing-and-integrity.html     Hashes, MACs, AEAD; confidentiality vs integrity
+├── 04-symmetric.html                 AES rounds and key schedule; ChaCha20 state
+├── 05-modes.html                     ECB/CBC/CTR/GCM/XTS; padding; the ECB image leak
+├── 06-asymmetric.html                RSA maths, OAEP, capacity limits, ECC, ECDH
+├── 07-hybrid.html                    The combined scheme; what an attacker must protect
+├── 08-coverage.html                  Four coverage patterns; format fragility; fine striping
+├── 09-key-models.html                Session vs per-file; ephemeral ECDH; the zero-nonce case
+├── 10-os-native.html                 Full-disk layering; protectors; key escrow
+├── 11-telling-them-apart.html        A four-question identification method; three traps
+├── CODE_OF_CONDUCT.md                Conduct and sample-handling rules
+├── CONTRIBUTING.md                   Contribution rules
+├── engine.py                         Page template engine
+├── FIRST-60-MINUTES.md
+├── GLOSSARY.md
+├── index.html                        Academy home with live ECB hero
+├── LICENSE                           MIT
+├── make_structure.py                 Generates this file from the tree
+├── MYTHS.md
+├── pages.py                          All page content — run engine.py to build
+├── README.md                         Repository readme
+├── reference.html                    Sizes, constants, glossary, common misconceptions
+├── SCOPE.md                          What this project covers and deliberately omits
+└── svg_diagrams.py                   SVG diagram components, theme-aware
+
+108 entries listed.

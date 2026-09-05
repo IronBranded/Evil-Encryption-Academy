@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telling them apart — Evil Encryption Academy</title>
+<meta name="description" content="Everything so far, applied backwards. Given an encrypted file and nothing else, how much can you work out about the scheme that produced it?">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Evil Encryption Academy">
+<meta property="og:title" content="Telling them apart">
+<meta property="og:description" content="Everything so far, applied backwards. Given an encrypted file and nothing else, how much can you work out about the scheme that produced it?">
+<meta property="og:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Telling them apart">
+<meta name="twitter:description" content="Everything so far, applied backwards. Given an encrypted file and nothing else, how much can you work out about the scheme that produced it?">
+<meta name="twitter:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+<script>
+/* Apply the stored theme before first paint so the page never flashes the wrong one. */
+(function(){try{var t=localStorage.getItem('eea-theme');
+if(t&&t!=='system')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<button class="menu-btn ghost" aria-controls="sidenav" aria-expanded="false">Menu</button>
+<div class="shell">
+<aside class="side" id="sidenav">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<div class="prog">
+  <div class="prog-bar"><div class="prog-fill"></div></div>
+  <p class="prog-txt"><span class="prog-count">0 of 11 read</span>
+    <button class="prog-reset" type="button">reset</button></p>
+</div>
+<nav>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <h4>Foundations</h4>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-keys-and-randomness.html" data-p="02"><i>02</i>Keys and randomness</a>
+  <a href="03-hashing-and-integrity.html" data-p="03"><i>03</i>Hashing and integrity</a>
+  <h4>The two families</h4>
+  <a href="04-symmetric.html" data-p="04"><i>04</i>Symmetric encryption</a>
+  <a href="05-modes.html" data-p="05"><i>05</i>Modes of operation</a>
+  <a href="06-asymmetric.html" data-p="06"><i>06</i>Asymmetric encryption</a>
+  <h4>Ransomware encryption</h4>
+  <a href="07-hybrid.html" data-p="07"><i>07</i>The hybrid scheme</a>
+  <a href="08-coverage.html" data-p="08"><i>08</i>How much gets encrypted</a>
+  <a href="09-key-models.html" data-p="09"><i>09</i>Key models</a>
+  <a href="10-os-native.html" data-p="10"><i>10</i>OS-native encryption</a>
+  <h4>Putting it together</h4>
+  <a href="11-telling-them-apart.html" data-p="11"><i>11</i>Telling them apart</a>
+  <a href="reference.html" data-p="ref"><i>—</i>Reference</a>
+</nav>
+<div class="side-foot">
+  <button class="theme-btn" type="button">System theme</button>
+</div>
+</aside>
+<main id="content">
+<p class="crumb"><span>Putting it together · 11</span><span>4 min read</span></p>
+<h1>Telling them apart</h1>
+<p class="lede">Everything so far, applied backwards. Given an encrypted file and nothing else, how much can you work out about the scheme that produced it?</p>
+
+<h2>A method, not a lookup</h2>
+<p>Each design decision leaves a trace. You cannot read the data, but you can often describe the
+scheme quite precisely — and you can do it without the software, without a key, and without
+decrypting anything.</p>
+<p>Work through four questions in order. Each narrows the possibilities.</p>
+
+<h3>1. Is it actually encrypted?</h3>
+<p>Do not assume. Compressed formats score the same entropy as ciphertext, so the entropy number
+alone cannot answer this. What answers it is <strong>structure</strong>: does the file still begin
+with the header its extension implies?</p>
+<table>
+<tr><th>Observation</th><th>Conclusion</th></tr>
+<tr><td>High entropy, header intact and matching the extension</td><td>Probably just a compressed file</td></tr>
+<tr><td>High entropy, header absent where one is expected</td><td>The header has been encrypted</td></tr>
+<tr><td>An unrecognised extension appended to a recognised one</td><td>Something was appended after the real name</td></tr>
+</table>
+
+<h3>2. What size relationship does it have?</h3>
+<p>If an original is available for comparison, arithmetic settles a great deal.</p>
+<table>
+<tr><th>Size relationship</th><th>Indicates</th></tr>
+<tr><td>Identical to the original</td><td>Stream cipher, or a counter-based mode. No padding</td></tr>
+<tr><td>Rounded up to a multiple of 16</td><td>Block cipher with padding — CBC or ECB</td></tr>
+<tr><td>Multiple of 16, plus a consistent 16 bytes</td><td>Padding plus an authentication tag — an AEAD mode</td></tr>
+<tr><td>Plus a fixed 256 or 512 bytes</td><td>An RSA-wrapped key attached</td></tr>
+<tr><td>Plus a fixed 32 or 33 bytes</td><td>An elliptic-curve public key attached</td></tr>
+</table>
+<p>Overhead usually decomposes cleanly. A file 272 bytes larger than its original is likely 256
+bytes of RSA-2048 wrapped key plus 16 bytes of block padding. When the arithmetic closes exactly,
+the reading is probably right.</p>
+
+<h3>3. What is the coverage pattern?</h3>
+<p>Measure entropy in slices rather than as one number, and the pattern draws itself.</p>
+
+<figure role="img" aria-label="Four entropy profiles drawn as bar sequences: full encryption is uniformly high, header-only is high then low, intermittent alternates, and distributed chunks are high at the start, middle and end."><svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg">
+<text x="30" y="26" font-size="14" font-weight="600">Entropy measured in slices across a file</text>
+<text class="m" x="30" y="62" font-size="12">Full</text><rect class="box-c" x="200" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="211" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="222" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="233" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="244" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="255" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="266" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="277" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="288" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="299" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="310" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="321" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="332" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="343" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="354" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="365" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="376" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="387" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="398" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="409" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="420" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="431" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="442" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="453" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="464" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="475" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="486" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="497" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="508" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="519" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="530" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="541" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="552" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="563" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="574" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="585" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="596" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="607" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="618" y="46" width="9" height="26" rx="1.5"/><rect class="box-c" x="629" y="46" width="9" height="26" rx="1.5"/><text class="m" x="30" y="114" font-size="12">Header-only</text><rect class="box-c" x="200" y="98" width="9" height="26" rx="1.5"/><rect class="box-c" x="211" y="98" width="9" height="26" rx="1.5"/><rect class="box-c" x="222" y="98" width="9" height="26" rx="1.5"/><rect class="box-c" x="233" y="98" width="9" height="26" rx="1.5"/><rect class="box-c" x="244" y="98" width="9" height="26" rx="1.5"/><rect class="box-p" x="255" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="266" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="277" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="288" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="299" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="310" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="321" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="332" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="343" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="354" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="365" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="376" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="387" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="398" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="409" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="420" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="431" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="442" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="453" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="464" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="475" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="486" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="497" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="508" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="519" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="530" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="541" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="552" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="563" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="574" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="585" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="596" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="607" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="618" y="115" width="9" height="9" rx="1.5"/><rect class="box-p" x="629" y="115" width="9" height="9" rx="1.5"/><text class="m" x="30" y="166" font-size="12">Intermittent</text><rect class="box-c" x="200" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="211" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="222" y="150" width="9" height="26" rx="1.5"/><rect class="box-p" x="233" y="167" width="9" height="9" rx="1.5"/><rect class="box-p" x="244" y="167" width="9" height="9" rx="1.5"/><rect class="box-p" x="255" y="167" width="9" height="9" rx="1.5"/><rect class="box-c" x="266" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="277" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="288" y="150" width="9" height="26" rx="1.5"/><rect class="box-p" x="299" y="167" width="9" height="9" rx="1.5"/><rect class="box-p" x="310" y="167" width="9" height="9" rx="1.5"/><rect class="box-p" x="321" y="167" width="9" height="9" rx="1.5"/><rect class="box-c" x="332" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="343" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="354" y="150" width="9" height="26" rx="1.5"/><rect class="box-p" x="365" y="167" width="9" height="9" rx="1.5"/><rect class="box-p" x="376" y="167" width="9" height="9" rx="1.5"/><rect class="box-p" x="387" y="167" width="9" height="9" rx="1.5"/><rect class="box-c" x="398" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="409" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="420" y="150" width="9" height="26" rx="1.5"/><rect class="box-p" x="431" y="167" width="9" height="9" rx="1.5"/><rect class="box-p" x="442" y="167" width="9" height="9" rx="1.5"/><rect class="box-p" x="453" y="167" width="9" height="9" rx="1.5"/><rect class="box-c" x="464" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="475" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="486" y="150" width="9" height="26" rx="1.5"/><rect class="box-p" x="497" y="167" width="9" height="9" rx="1.5"/><rect class="box-p" x="508" y="167" width="9" height="9" rx="1.5"/><rect class="box-p" x="519" y="167" width="9" height="9" rx="1.5"/><rect class="box-c" x="530" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="541" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="552" y="150" width="9" height="26" rx="1.5"/><rect class="box-p" x="563" y="167" width="9" height="9" rx="1.5"/><rect class="box-p" x="574" y="167" width="9" height="9" rx="1.5"/><rect class="box-p" x="585" y="167" width="9" height="9" rx="1.5"/><rect class="box-c" x="596" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="607" y="150" width="9" height="26" rx="1.5"/><rect class="box-c" x="618" y="150" width="9" height="26" rx="1.5"/><rect class="box-p" x="629" y="167" width="9" height="9" rx="1.5"/><text class="m" x="30" y="218" font-size="12">Distributed chunks</text><rect class="box-c" x="200" y="202" width="9" height="26" rx="1.5"/><rect class="box-c" x="211" y="202" width="9" height="26" rx="1.5"/><rect class="box-p" x="222" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="233" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="244" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="255" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="266" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="277" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="288" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="299" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="310" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="321" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="332" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="343" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="354" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="365" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="376" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="387" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="398" y="219" width="9" height="9" rx="1.5"/><rect class="box-c" x="409" y="202" width="9" height="26" rx="1.5"/><rect class="box-c" x="420" y="202" width="9" height="26" rx="1.5"/><rect class="box-p" x="431" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="442" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="453" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="464" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="475" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="486" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="497" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="508" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="519" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="530" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="541" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="552" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="563" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="574" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="585" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="596" y="219" width="9" height="9" rx="1.5"/><rect class="box-p" x="607" y="219" width="9" height="9" rx="1.5"/><rect class="box-c" x="618" y="202" width="9" height="26" rx="1.5"/><rect class="box-c" x="629" y="202" width="9" height="26" rx="1.5"/>
+<text class="tiny" x="30" y="250">tall = high entropy (ciphertext)   ·   short = low entropy (structured data)</text>
+</svg><figcaption>Four profiles, four schemes. Measuring in slices rather than as one number is what makes the pattern visible.</figcaption></figure>
+
+<p>Remember the resolution rule from module 08: your measurement window must be smaller than the
+feature you are looking for. Fine striping is invisible at 4 KB and obvious at 512 bytes.</p>
+
+<h3>4. What is the key model?</h3>
+<p>Compare the trailing bytes across several files. Identical means one key for the host; different
+means one key per file. This takes seconds and it reshapes everything else you conclude.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · identify the scheme</b><span>five questions</span></div>
+  <div class="sim-body">
+    <p id="s11-q" style="font-weight:600"></p>
+    <div class="out tight" id="s11-ev" style="min-height:90px"></div>
+    <div class="row" id="s11-opts"></div>
+    <div class="out" id="s11-fb" style="min-height:20px"></div>
+    <div class="row"><button id="s11-next">Next question</button>
+      <button class="ghost" id="s11-restart">Start over</button>
+      <span class="stat" id="s11-score"></span></div>
+  </div>
+</div>
+
+<h2>Three traps</h2>
+
+<h3>High entropy does not mean encrypted</h3>
+<p>JPEG scores around 7.9, MP4 around 8.0, ZIP similarly. Compression produces evenly distributed
+bytes for the same reason encryption does. Judging on entropy alone marks every photograph and
+video as encrypted, which is not a small error — it is the difference between "three files were
+affected" and "three hundred were".</p>
+
+<h3>High entropy does not mean secure</h3>
+<p>AES-ECB scores near the maximum and leaks the picture straight through, as module 05 showed
+directly. Entropy measures distribution. It cannot see block-level repetition, which is exactly
+what breaks ECB. The measurement that catches it is distinct block count.</p>
+
+<h3>Small samples never reach 8.0</h3>
+<p>A 128-byte sample of perfect ciphertext scores about 6.55, because 128 values cannot populate
+256 slots. Comparing a small wrapped-key blob against 8.0 will make genuine ciphertext look
+non-random and you will discard a correct finding.</p>
+
+<div class="note">
+<p><b>The habit worth forming.</b> Entropy is one measurement among several and on its own it is
+the weakest of them. Size relationships, block repetition, header integrity and the shape of
+trailing data each say something entropy cannot. A conclusion supported by two independent
+observations is worth far more than one supported by a single number.</p>
+</div>
+
+<h2>What you can and cannot determine</h2>
+<table>
+<tr><th>Determinable from the output alone</th><th>Not determinable</th></tr>
+<tr><td>Block or stream cipher</td><td>Which specific cipher</td></tr>
+<tr><td>Whether padding is used</td><td>The key</td></tr>
+<tr><td>Whether an AEAD tag is present</td><td>The plaintext</td></tr>
+<tr><td>Coverage pattern and percentage</td><td>Which family, with certainty</td></tr>
+<tr><td>Key model — session or per-file</td><td>Where the key came from</td></tr>
+<tr><td>Probable asymmetric family, from blob size</td><td>Whether the key was well generated</td></tr>
+</table>
+<p>The right-hand column is not a failure. It marks the boundary of what an output-only analysis
+can reach, and knowing where that boundary sits is part of doing the analysis honestly.</p>
+
+<h2>Where to go next</h2>
+<p>You now have the concepts. For the cryptography itself in more depth, <em>Serious
+Cryptography</em> by Jean-Philippe Aumasson is the standard modern reference. For how specific
+families combine these parts, published vendor threat-intelligence writeups give the detail — read
+them for the scheme first and the indicators last.</p>
+<p>The <a href="reference.html">reference page</a> collects every term, size and constant used
+across these eleven modules in one place.</p>
+
+<div class="done-bar" data-p="11"><p>Finished this module?</p><button type="button" aria-pressed="false">Mark as read</button></div>
+<div class="pager"><a href="10-os-native.html"><em>Previous</em>OS-native encryption</a><a class="nxt" href="reference.html"><em>Next</em>Reference</a></div>
+<p class="kbd-hint">Use <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> to move between modules</p>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="11"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+const Q=[
+ {q:'A file is 40,960 bytes. The original was 40,953 bytes. What does the size tell you?',
+  e:'original    40,953 bytes\nencrypted   40,960 bytes\ndifference       +7 bytes\n\n40,960 ÷ 16 = 2,560 exactly',
+  o:['A stream cipher','A block cipher with padding','An authentication tag','Header-only encryption'],
+  a:1,
+  why:'The output is an exact multiple of 16 and grew by just enough to reach it. That is block '+
+      'padding — CBC or ECB. A stream cipher would have left the size unchanged.'},
+ {q:'Scanning the ciphertext, the same 16 bytes appear 340 times. What does that mean?',
+  e:'block 0x0000  a3 f1 09 7c 22 be 40 15 …\nblock 0x0110  a3 f1 09 7c 22 be 40 15 …  ← identical\nblock 0x0230  a3 f1 09 7c 22 be 40 15 …  ← identical\n\n340 repeats of one block',
+  o:['Normal for any cipher','The file was encrypted twice','ECB mode','A corrupted file'],
+  a:2,
+  why:'Identical ciphertext blocks mean identical plaintext blocks. Only ECB has that property, '+
+      'because it encrypts each block independently. Structure is leaking.'},
+ {q:'Five encrypted files each end with a 32-byte high-entropy tail, and all five differ. What is the key model?',
+  e:'invoice.locked   tail 3f8a…c412   (32 bytes)\nledger.locked    tail 91b0…7ee3   (32 bytes)\ncontract.locked  tail 04dd…a180   (32 bytes)\n\nall distinct',
+  o:['One session key for the host','Per-file keys','No encryption key at all','RSA-4096 wrapping'],
+  a:1,
+  why:'Different tails mean different key material per file. The 32-byte size points to elliptic '+
+      'curve rather than RSA — an RSA-wrapped key would be 256 or 512 bytes.'},
+ {q:'A file scores 7.98 entropy. Its name ends .jpg and it starts with FF D8 FF E0 … JFIF. Encrypted?',
+  e:'entropy   7.98 / 8.000\nheader    ff d8 ff e0 00 10 4a 46 49 46   |......JFIF|\nname      holiday.jpg',
+  o:['Yes — the entropy is very high','No — the header is intact and matches','Cannot tell from this','Only the header is encrypted'],
+  a:1,
+  why:'JPEG is compressed, so high entropy is expected and normal. The JFIF header is present and '+
+      'matches the extension. This is simply a photograph.'},
+ {q:'Entropy across a large file alternates high, low, high, low, evenly throughout. Which pattern?',
+  e:'entropy profile, per slice\n\n████····████····████····████····████····████····\n\nhigh ≈ 7.9   low ≈ 4.2',
+  o:['Full encryption','Header-only','Intermittent bands','Distributed chunks'],
+  a:2,
+  why:'Regular alternation throughout is intermittent encryption. Header-only would be high at the '+
+      'start then flat. Distributed chunks would show high regions only at the start, middle and end.'}
+];
+let qi=0, score=0, answered=false;
+function s11draw(){
+  const q=Q[qi];
+  document.getElementById('s11-q').textContent='Question '+(qi+1)+' of '+Q.length+' — '+q.q;
+  document.getElementById('s11-ev').textContent=q.e;
+  const box=document.getElementById('s11-opts'); box.innerHTML='';
+  q.o.forEach((t,i)=>{
+    const b=document.createElement('button'); b.className='ghost'; b.type='button'; b.textContent=t;
+    b.addEventListener('click',()=>{
+      if(answered) return; answered=true;
+      const ok=(i===q.a); if(ok) score++;
+      document.getElementById('s11-fb').innerHTML =
+        (ok?'<b class="c-plain">Correct.</b> ':'<b class="c-cipher">Not quite.</b> The answer is “'+q.o[q.a]+'”. ')+q.why;
+      document.getElementById('s11-score').textContent='score '+score+' / '+Q.length;
+    });
+    box.appendChild(b);
+  });
+  document.getElementById('s11-fb').textContent=''; answered=false;
+}
+document.getElementById('s11-next').addEventListener('click',()=>{
+  if(qi<Q.length-1){ qi++; s11draw(); }
+  else { document.getElementById('s11-fb').innerHTML='<b>Finished.</b> Final score '+score+' of '+
+    Q.length+'. Every one of these was answerable from the output alone — no key, no software, no tooling.'; }
+});
+document.getElementById('s11-restart').addEventListener('click',()=>{ qi=0;score=0;s11draw();
+  document.getElementById('s11-score').textContent=''; });
+s11draw();
+</script>
+</body>
+</html>

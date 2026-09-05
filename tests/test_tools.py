@@ -512,6 +512,28 @@ class TestRepositoryIntegrity(unittest.TestCase):
     These tests make that drift fail CI instead of quietly accumulating.
     """
 
+    def test_structure_txt_is_current(self):
+        """
+        BUG: the old check only verified that files NAMED in STRUCTURE.txt exist.
+        It never verified that files that exist are NAMED, so the map silently
+        drifted to describe a completely different repository and passed. It is
+        now generated from the tree, and this proves the checked-in copy matches.
+        """
+        import subprocess, shutil, tempfile
+        gen = os.path.join(ROOT, "make_structure.py")
+        if not os.path.exists(gen):
+            self.skipTest("no generator")
+        current = open(os.path.join(ROOT, "STRUCTURE.txt"), encoding="utf-8").read()
+        backup = current
+        try:
+            subprocess.run([sys.executable, gen], cwd=ROOT, capture_output=True, check=True)
+            regenerated = open(os.path.join(ROOT, "STRUCTURE.txt"), encoding="utf-8").read()
+        finally:
+            with open(os.path.join(ROOT, "STRUCTURE.txt"), "w", encoding="utf-8") as fh:
+                fh.write(backup)
+        self.assertEqual(current, regenerated,
+                         "STRUCTURE.txt is stale — run python3 make_structure.py")
+
     def test_structure_txt_only_promises_files_that_exist(self):
         import re
         missing = []
@@ -587,6 +609,48 @@ class TestRepositoryIntegrity(unittest.TestCase):
                 if not os.path.exists(os.path.join(ROOT, href)):
                     bad.append(f"{p} -> {href}")
         self.assertEqual(bad, [], f"dead links in site pages: {bad}")
+
+    def test_every_page_has_accessibility_and_social_metadata(self):
+        """
+        The site had zero aria attributes, no favicon and no social preview.
+        The canvas simulations are visual arguments with no text alternative
+        unless one is supplied deliberately, so this guards against regression.
+        """
+        pages = [f for f in os.listdir(ROOT) if f.endswith(".html")]
+        for p in pages:
+            with open(os.path.join(ROOT, p), encoding="utf-8") as fh:
+                body = fh.read()
+            with self.subTest(page=p):
+                self.assertIn('property="og:title"', body, "no social preview metadata")
+                self.assertIn('rel="icon"', body, "no favicon")
+                self.assertIn('class="skip"', body, "no skip-to-content link")
+                self.assertIn('data-theme', body, "no theme handling")
+                if "<canvas" in body:
+                    self.assertIn('role="status"', body,
+                                  "canvas present but no text alternative")
+
+    def test_diagrams_are_svg_not_ascii_art(self):
+        """Diagram work drawn in monospace was what made the site look plain."""
+        # index leads with live canvases; reference is a glossary, not a lesson
+        skip = {"index.html", "reference.html"}
+        for p in [f for f in os.listdir(ROOT) if f.endswith(".html") and f not in skip]:
+            with open(os.path.join(ROOT, p), encoding="utf-8") as fh:
+                body = fh.read()
+            with self.subTest(page=p):
+                self.assertIn("<svg", body, "page has no SVG diagram")
+                self.assertIn("<figcaption", body, "SVG has no caption")
+                self.assertIn('role="img"', body, "SVG has no accessible label")
+
+    def test_referenced_assets_exist(self):
+        import re
+        bad = []
+        for p in [f for f in os.listdir(ROOT) if f.endswith(".html")]:
+            with open(os.path.join(ROOT, p), encoding="utf-8") as fh:
+                body = fh.read()
+            for a in re.findall(r'(?:href|src)="(assets/[^"]+)"', body):
+                if not os.path.exists(os.path.join(ROOT, a)):
+                    bad.append(f"{p} -> {a}")
+        self.assertEqual(bad, [], f"missing assets: {bad}")
 
     def test_license_exists_and_matches_claims(self):
         """Six files claim MIT. Without a LICENSE the repo is all-rights-reserved."""

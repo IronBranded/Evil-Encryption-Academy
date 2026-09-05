@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Key models — Evil Encryption Academy</title>
+<meta name="description" content="One key for the whole machine, or a fresh key for every file. This single design choice changes more about a scheme than the choice of cipher does.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Evil Encryption Academy">
+<meta property="og:title" content="Key models">
+<meta property="og:description" content="One key for the whole machine, or a fresh key for every file. This single design choice changes more about a scheme than the choice of cipher does.">
+<meta property="og:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Key models">
+<meta name="twitter:description" content="One key for the whole machine, or a fresh key for every file. This single design choice changes more about a scheme than the choice of cipher does.">
+<meta name="twitter:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+<script>
+/* Apply the stored theme before first paint so the page never flashes the wrong one. */
+(function(){try{var t=localStorage.getItem('eea-theme');
+if(t&&t!=='system')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<button class="menu-btn ghost" aria-controls="sidenav" aria-expanded="false">Menu</button>
+<div class="shell">
+<aside class="side" id="sidenav">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<div class="prog">
+  <div class="prog-bar"><div class="prog-fill"></div></div>
+  <p class="prog-txt"><span class="prog-count">0 of 11 read</span>
+    <button class="prog-reset" type="button">reset</button></p>
+</div>
+<nav>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <h4>Foundations</h4>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-keys-and-randomness.html" data-p="02"><i>02</i>Keys and randomness</a>
+  <a href="03-hashing-and-integrity.html" data-p="03"><i>03</i>Hashing and integrity</a>
+  <h4>The two families</h4>
+  <a href="04-symmetric.html" data-p="04"><i>04</i>Symmetric encryption</a>
+  <a href="05-modes.html" data-p="05"><i>05</i>Modes of operation</a>
+  <a href="06-asymmetric.html" data-p="06"><i>06</i>Asymmetric encryption</a>
+  <h4>Ransomware encryption</h4>
+  <a href="07-hybrid.html" data-p="07"><i>07</i>The hybrid scheme</a>
+  <a href="08-coverage.html" data-p="08"><i>08</i>How much gets encrypted</a>
+  <a href="09-key-models.html" data-p="09"><i>09</i>Key models</a>
+  <a href="10-os-native.html" data-p="10"><i>10</i>OS-native encryption</a>
+  <h4>Putting it together</h4>
+  <a href="11-telling-them-apart.html" data-p="11"><i>11</i>Telling them apart</a>
+  <a href="reference.html" data-p="ref"><i>—</i>Reference</a>
+</nav>
+<div class="side-foot">
+  <button class="theme-btn" type="button">System theme</button>
+</div>
+</aside>
+<main id="content">
+<p class="crumb"><span>Ransomware encryption · 09</span><span>4 min read</span></p>
+<h1>Key models</h1>
+<p class="lede">One key for the whole machine, or a fresh key for every file. This single design choice changes more about a scheme than the choice of cipher does.</p>
+
+<h2>Two designs</h2>
+
+<figure role="img" aria-label="Two columns of four files each. Under a session key every wrapped key blob is identical; under per-file keys every blob is different."><svg viewBox="0 0 700 290" xmlns="http://www.w3.org/2000/svg">
+<text x="20" y="26" font-size="13.5" font-weight="600">Session key</text>
+<text class="tiny" x="20" y="44">one key for the whole host</text>
+<rect class="box-c" x="20" y="62" width="140" height="30" rx="3"/><text class="m" x="90" y="82" text-anchor="middle" font-size="10.5">file 1</text><rect class="box-k" x="170" y="62" width="86" height="30" rx="3"/><text class="m" x="213" y="82" text-anchor="middle" font-size="9.5">3f8a…c4</text><rect class="box-c" x="20" y="108" width="140" height="30" rx="3"/><text class="m" x="90" y="128" text-anchor="middle" font-size="10.5">file 2</text><rect class="box-k" x="170" y="108" width="86" height="30" rx="3"/><text class="m" x="213" y="128" text-anchor="middle" font-size="9.5">3f8a…c4</text><rect class="box-c" x="20" y="154" width="140" height="30" rx="3"/><text class="m" x="90" y="174" text-anchor="middle" font-size="10.5">file 3</text><rect class="box-k" x="170" y="154" width="86" height="30" rx="3"/><text class="m" x="213" y="174" text-anchor="middle" font-size="9.5">3f8a…c4</text><rect class="box-c" x="20" y="200" width="140" height="30" rx="3"/><text class="m" x="90" y="220" text-anchor="middle" font-size="10.5">file 4</text><rect class="box-k" x="170" y="200" width="86" height="30" rx="3"/><text class="m" x="213" y="220" text-anchor="middle" font-size="9.5">3f8a…c4</text>
+<text class="tiny fill-c" x="20" y="270">every wrapped blob is identical</text>
+<line class="arrow" x1="350" y1="20" x2="350" y2="256" stroke-dasharray="3 4"/>
+<text x="384" y="26" font-size="13.5" font-weight="600">Per-file keys</text>
+<text class="tiny" x="384" y="44">a fresh key for every file</text>
+<rect class="box-c" x="384" y="62" width="140" height="30" rx="3"/><text class="m" x="454" y="82" text-anchor="middle" font-size="10.5">file 1</text><rect class="box-k" x="534" y="62" width="86" height="30" rx="3"/><text class="m" x="577" y="82" text-anchor="middle" font-size="9.5">3f8a…c4</text><rect class="box-c" x="384" y="108" width="140" height="30" rx="3"/><text class="m" x="454" y="128" text-anchor="middle" font-size="10.5">file 2</text><rect class="box-k" x="534" y="108" width="86" height="30" rx="3"/><text class="m" x="577" y="128" text-anchor="middle" font-size="9.5">91b0…7e</text><rect class="box-c" x="384" y="154" width="140" height="30" rx="3"/><text class="m" x="454" y="174" text-anchor="middle" font-size="10.5">file 3</text><rect class="box-k" x="534" y="154" width="86" height="30" rx="3"/><text class="m" x="577" y="174" text-anchor="middle" font-size="9.5">04dd…a1</text><rect class="box-c" x="384" y="200" width="140" height="30" rx="3"/><text class="m" x="454" y="220" text-anchor="middle" font-size="10.5">file 4</text><rect class="box-k" x="534" y="200" width="86" height="30" rx="3"/><text class="m" x="577" y="220" text-anchor="middle" font-size="9.5">c7e2…5b</text>
+<text class="tiny fill-p" x="384" y="270">every wrapped blob differs</text>
+</svg><figcaption>Comparing the trailing blob across a handful of files reveals the key model immediately, without decrypting anything.</figcaption></figure>
+
+<table>
+<tr><th></th><th>Session key</th><th>Per-file keys</th></tr>
+<tr><td>Keys generated</td><td>One, for the whole host</td><td>One per file</td></tr>
+<tr><td>Wrapped blobs on disk</td><td>All identical, or stored once</td><td>All different</td></tr>
+<tr><td>Wrap operations</td><td>One</td><td>One per file</td></tr>
+<tr><td>Cross-file analysis</td><td>Possible — material is shared</td><td>Impossible — nothing is shared</td></tr>
+<tr><td>Effect of one key being exposed</td><td>Everything opens</td><td>One file opens</td></tr>
+</table>
+
+<p>Older families frequently used a session key because it is simpler and marginally faster. Modern
+ones use per-file keys almost universally, because it removes an entire category of weakness: with
+a fresh key and fresh nonce per file, no two files share anything that could be compared.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · what each model leaves on disk</b><span>compare the wrapped blobs</span></div>
+  <div class="sim-body">
+    <div class="row">
+      <label for="s9-mode">Key model</label>
+      <select id="s9-mode">
+        <option value="session">Session key — one for the host</option>
+        <option value="perfile" selected>Per-file keys</option>
+      </select>
+      <button id="s9-go">Encrypt five files</button>
+    </div>
+    <div class="out tight" id="s9-out" style="min-height:150px"></div>
+    <p class="stat" id="s9-stat"></p>
+  </div>
+</div>
+
+<p>This is why comparing the trailing blob across a handful of files is such a productive first
+move. It requires no key, no software and no decryption — and it settles the question immediately.</p>
+
+<h2>Ephemeral key agreement</h2>
+<p>The most current designs go further than a random key per file. For each file they generate an
+entire throwaway <em>keypair</em>, then use elliptic-curve Diffie-Hellman against the operator's
+embedded public key to derive a shared secret. That secret becomes the file's encryption key.</p>
+
+<div class="out tight">for every file:
+  1. generate a throwaway keypair          (ephemeral private + public)
+  2. combine ephemeral private + operator public   → shared secret
+  3. use the shared secret as the file key
+  4. store the ephemeral PUBLIC key with the file
+  5. discard the ephemeral private key</div>
+
+<p>To decrypt later, the operator combines their private key with the stored ephemeral public key
+and arrives at the same shared secret. Nothing else is needed.</p>
+
+<h3>The properties this produces</h3>
+<ul>
+  <li><strong>Nothing sensitive is stored.</strong> The value written to the file is a public key.
+      On its own it reveals nothing at all — publishing it costs the attacker nothing.</li>
+  <li><strong>No wrapped key exists.</strong> There is no encrypted blob to attack, because the key
+      was never encrypted. It was derived.</li>
+  <li><strong>No nonce field is needed.</strong> The nonce can be derived deterministically from
+      the stored public key, so it never has to be written separately.</li>
+  <li><strong>A fixed nonce becomes safe.</strong> Reusing a nonce is normally a serious bug, but
+      it is only dangerous when the <em>key</em> repeats. Here every file has a unique shared
+      secret, so a constant nonce never repeats under the same key.</li>
+</ul>
+
+<div class="note">
+<p><b>That last point is worth remembering carefully.</b> Seeing a zero or constant nonce usually
+indicates a mistake, and in most schemes it is one. In a per-file ephemeral design it is not —
+the key lifecycle makes it sound. Judging the nonce without first checking how the key was produced
+gets this exactly backwards, and it is a mistake that is easy to make with confidence.</p>
+</div>
+
+<h2>Where the key lives while it is being used</h2>
+<p>Whatever the model, the symmetric key must exist in plain form at some point — a cipher cannot
+work with a wrapped key. That window is brief and it is the only moment in the entire scheme where
+the plaintext key and the data are in the same place.</p>
+<div class="out tight">key generated ──▶ file encrypted ──▶ key wrapped or discarded ──▶ key erased
+              └────────── the key exists in plain form ──────────┘</div>
+<p>Before that window the key does not exist. After it, the only remaining form is one that
+requires the operator's private key to open. Well-built schemes make the window as short as
+possible and overwrite the memory afterwards rather than merely releasing it.</p>
+
+<h2>Identifying the model in practice</h2>
+<table>
+<tr><th>Observation</th><th>Model</th></tr>
+<tr><td>Trailing blobs identical across files</td><td>Session key</td></tr>
+<tr><td>No trailing blob at all; one separate key file</td><td>Session key, stored once</td></tr>
+<tr><td>Trailing blobs all different, 256 or 512 bytes</td><td>Per-file key, RSA-wrapped</td></tr>
+<tr><td>Trailing blobs all different, 32 or 33 bytes</td><td>Per-file ephemeral key agreement</td></tr>
+</table>
+<p>Four observations, four distinct designs, and every one of them determinable from the encrypted
+files alone. Module 11 develops this into a full identification method.</p>
+
+<div class="done-bar" data-p="09"><p>Finished this module?</p><button type="button" aria-pressed="false">Mark as read</button></div>
+<div class="pager"><a href="08-coverage.html"><em>Previous</em>How much gets encrypted</a><a class="nxt" href="10-os-native.html"><em>Next</em>OS-native encryption</a></div>
+<p class="kbd-hint">Use <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> to move between modules</p>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="09"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+async function s9run(){
+  const mode=document.getElementById('s9-mode').value;
+  const names=['invoice.xlsx','ledger.mdf','contract.docx','archive.pst','backup.vmdk'];
+  const session=crypto.getRandomValues(new Uint8Array(32));
+  let o='', blobs=[];
+  for(const n of names){
+    const fileKey = mode==='session' ? session : crypto.getRandomValues(new Uint8Array(32));
+    const wrapped = hex(await crypto.subtle.digest('SHA-256', fileKey)).slice(0,32);
+    blobs.push(wrapped);
+    o += (n+'.locked').padEnd(22)+'wrapped key  '+wrapped+'\n';
+  }
+  const uniq=new Set(blobs).size;
+  document.getElementById('s9-out').textContent = o+'\ndistinct wrapped blobs: '+uniq+' of '+blobs.length;
+  document.getElementById('s9-stat').innerHTML = mode==='session'
+    ? 'Every blob is <b>identical</b>. One key encrypted all five files, so the same wrapped value '+
+      'repeats on each. Comparing any two files reveals the model immediately.'
+    : 'Every blob is <b>different</b>. Five files, five keys, five wraps. Nothing is shared between '+
+      'files, so there is nothing to compare across them.';
+}
+document.getElementById('s9-go').addEventListener('click',s9run);
+document.getElementById('s9-mode').addEventListener('change',s9run);
+s9run();
+</script>
+</body>
+</html>

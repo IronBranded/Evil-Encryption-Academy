@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modes of operation — Evil Encryption Academy</title>
+<meta name="description" content="AES is not broken. AES-ECB is. The mode decides whether a perfectly correct cipher produces a secure result or leaves your data readable in plain sight.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Evil Encryption Academy">
+<meta property="og:title" content="Modes of operation">
+<meta property="og:description" content="AES is not broken. AES-ECB is. The mode decides whether a perfectly correct cipher produces a secure result or leaves your data readable in plain sight.">
+<meta property="og:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Modes of operation">
+<meta name="twitter:description" content="AES is not broken. AES-ECB is. The mode decides whether a perfectly correct cipher produces a secure result or leaves your data readable in plain sight.">
+<meta name="twitter:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+<script>
+/* Apply the stored theme before first paint so the page never flashes the wrong one. */
+(function(){try{var t=localStorage.getItem('eea-theme');
+if(t&&t!=='system')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<button class="menu-btn ghost" aria-controls="sidenav" aria-expanded="false">Menu</button>
+<div class="shell">
+<aside class="side" id="sidenav">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<div class="prog">
+  <div class="prog-bar"><div class="prog-fill"></div></div>
+  <p class="prog-txt"><span class="prog-count">0 of 11 read</span>
+    <button class="prog-reset" type="button">reset</button></p>
+</div>
+<nav>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <h4>Foundations</h4>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-keys-and-randomness.html" data-p="02"><i>02</i>Keys and randomness</a>
+  <a href="03-hashing-and-integrity.html" data-p="03"><i>03</i>Hashing and integrity</a>
+  <h4>The two families</h4>
+  <a href="04-symmetric.html" data-p="04"><i>04</i>Symmetric encryption</a>
+  <a href="05-modes.html" data-p="05"><i>05</i>Modes of operation</a>
+  <a href="06-asymmetric.html" data-p="06"><i>06</i>Asymmetric encryption</a>
+  <h4>Ransomware encryption</h4>
+  <a href="07-hybrid.html" data-p="07"><i>07</i>The hybrid scheme</a>
+  <a href="08-coverage.html" data-p="08"><i>08</i>How much gets encrypted</a>
+  <a href="09-key-models.html" data-p="09"><i>09</i>Key models</a>
+  <a href="10-os-native.html" data-p="10"><i>10</i>OS-native encryption</a>
+  <h4>Putting it together</h4>
+  <a href="11-telling-them-apart.html" data-p="11"><i>11</i>Telling them apart</a>
+  <a href="reference.html" data-p="ref"><i>—</i>Reference</a>
+</nav>
+<div class="side-foot">
+  <button class="theme-btn" type="button">System theme</button>
+</div>
+</aside>
+<main id="content">
+<p class="crumb"><span>The two families · 05</span><span>5 min read</span></p>
+<h1>Modes of operation</h1>
+<p class="lede">AES is not broken. AES-ECB is. The mode decides whether a perfectly correct cipher produces a secure result or leaves your data readable in plain sight.</p>
+
+<h2>The problem a mode solves</h2>
+<p>A block cipher encrypts exactly 16 bytes. Real files are larger, so something has to decide how
+successive blocks relate to one another. That decision is the mode of operation, and it matters
+more than which cipher you picked.</p>
+
+<figure role="img" aria-label="Diagram comparing ECB, where each block is encrypted independently, with CBC, where each ciphertext block feeds into the next block's encryption."><svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+<text x="60" y="26" font-size="14" font-weight="600" class="fill-c">ECB — every block encrypted on its own</text>
+<rect class="box-p" x="60" y="44" width="96" height="30" rx="4"/><text class="m" x="108" y="64" text-anchor="middle" font-size="11.5">block 1</text><path class="arrow" d="M108 78 v20" marker-end="url(#ah2)"/><rect class="box-c" x="60" y="102" width="96" height="30" rx="4"/><text class="m" x="108" y="122" text-anchor="middle" font-size="11.5">cipher 1</text><rect class="box-p" x="210" y="44" width="96" height="30" rx="4"/><text class="m" x="258" y="64" text-anchor="middle" font-size="11.5">block 2</text><path class="arrow" d="M258 78 v20" marker-end="url(#ah2)"/><rect class="box-c" x="210" y="102" width="96" height="30" rx="4"/><text class="m" x="258" y="122" text-anchor="middle" font-size="11.5">cipher 2</text><rect class="box-p" x="360" y="44" width="96" height="30" rx="4"/><text class="m" x="408" y="64" text-anchor="middle" font-size="11.5">block 3</text><path class="arrow" d="M408 78 v20" marker-end="url(#ah2)"/><rect class="box-c" x="360" y="102" width="96" height="30" rx="4"/><text class="m" x="408" y="122" text-anchor="middle" font-size="11.5">cipher 3</text><rect class="box-p" x="510" y="44" width="96" height="30" rx="4"/><text class="m" x="558" y="64" text-anchor="middle" font-size="11.5">block 4</text><path class="arrow" d="M558 78 v20" marker-end="url(#ah2)"/><rect class="box-c" x="510" y="102" width="96" height="30" rx="4"/><text class="m" x="558" y="122" text-anchor="middle" font-size="11.5">cipher 4</text>
+<text class="tiny" x="60" y="166">no link between blocks, so identical input always gives identical output</text>
+<line class="arrow" x1="60" y1="196" x2="660" y2="196" stroke-dasharray="3 4"/>
+<text x="60" y="232" font-size="14" font-weight="600" class="fill-p">CBC — each block folded into the next</text>
+<rect class="box-p" x="60" y="250" width="96" height="30" rx="4"/><text class="m" x="108" y="270" text-anchor="middle" font-size="11.5">block 1</text><path class="arrow" d="M108 284 v20" marker-end="url(#ah2)"/><rect class="box-p" x="60" y="308" width="96" height="30" rx="4"/><text class="m" x="108" y="328" text-anchor="middle" font-size="11.5">cipher 1</text><path class="arrow" d="M156 323 h30 v-45 h24" stroke-dasharray="3 3" marker-end="url(#ah2)"/><rect class="box-p" x="210" y="250" width="96" height="30" rx="4"/><text class="m" x="258" y="270" text-anchor="middle" font-size="11.5">block 2</text><path class="arrow" d="M258 284 v20" marker-end="url(#ah2)"/><rect class="box-p" x="210" y="308" width="96" height="30" rx="4"/><text class="m" x="258" y="328" text-anchor="middle" font-size="11.5">cipher 2</text><path class="arrow" d="M306 323 h30 v-45 h24" stroke-dasharray="3 3" marker-end="url(#ah2)"/><rect class="box-p" x="360" y="250" width="96" height="30" rx="4"/><text class="m" x="408" y="270" text-anchor="middle" font-size="11.5">block 3</text><path class="arrow" d="M408 284 v20" marker-end="url(#ah2)"/><rect class="box-p" x="360" y="308" width="96" height="30" rx="4"/><text class="m" x="408" y="328" text-anchor="middle" font-size="11.5">cipher 3</text><path class="arrow" d="M456 323 h30 v-45 h24" stroke-dasharray="3 3" marker-end="url(#ah2)"/><rect class="box-p" x="510" y="250" width="96" height="30" rx="4"/><text class="m" x="558" y="270" text-anchor="middle" font-size="11.5">block 4</text><path class="arrow" d="M558 284 v20" marker-end="url(#ah2)"/><rect class="box-p" x="510" y="308" width="96" height="30" rx="4"/><text class="m" x="558" y="328" text-anchor="middle" font-size="11.5">cipher 4</text>
+<text class="tiny" x="60" y="372">each block depends on the one before it, so repetition disappears</text>
+<defs><marker id="ah2" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+<path d="M0 0 L7 3.5 L0 7 z" fill="currentColor" class="lbl"/></marker></defs>
+</svg><figcaption>The only structural difference between the two modes — and the entire reason one of them leaks the picture.</figcaption></figure>
+
+<h2>The modes worth knowing</h2>
+<table>
+<tr><th>Mode</th><th>How blocks relate</th><th>Output size</th><th>Recognisable by</th></tr>
+<tr><td><strong>ECB</strong></td><td>Each block encrypted independently</td><td>Padded</td><td><strong>Repeating ciphertext blocks</strong></td></tr>
+<tr><td><strong>CBC</strong></td><td>Each block XORed with the previous ciphertext</td><td>Padded</td><td>16-byte IV, size a multiple of 16</td></tr>
+<tr><td><strong>CTR</strong></td><td>A counter is encrypted to make a keystream</td><td>Unchanged</td><td>Same size as the original</td></tr>
+<tr><td><strong>GCM</strong></td><td>CTR plus an authentication tag</td><td>+16 bytes</td><td>12-byte nonce, 16-byte tag</td></tr>
+<tr><td><strong>XTS</strong></td><td>Tweaked per disk sector</td><td>Unchanged</td><td>Full-disk encryption</td></tr>
+</table>
+
+<h3>ECB — independent blocks</h3>
+<p>The simplest possible arrangement, and the one you must never use. Each block goes through the
+cipher on its own with no reference to any other block.</p>
+<p>The consequence is direct: identical plaintext blocks always produce identical ciphertext blocks.
+Any large uniform region of a file — a background, a run of zeroes, a repeated record — stays
+uniform after encryption.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · the same image, two modes</b><span>real AES-256, identical key</span></div>
+  <div class="sim-body">
+    <p class="sr" id="s4-a11y" role="status"></p>
+    <div class="grid2">
+      <div><canvas id="s4-src" width="160" height="120" style="width:100%" aria-hidden="true"></canvas>
+        <p class="cap">original</p></div>
+      <div><canvas id="s4-ecb" width="160" height="120" style="width:100%" aria-hidden="true"></canvas>
+        <p class="cap c-cipher">AES-256-ECB — still readable</p></div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div><canvas id="s4-cbc" width="160" height="120" style="width:100%" aria-hidden="true"></canvas>
+        <p class="cap c-plain">AES-256-CBC — structure destroyed</p></div>
+      <div><p class="stat" id="s4-stats"></p></div>
+    </div>
+  </div>
+</div>
+
+<p>Both panels use the same key and the same correctly-implemented AES-256. Nothing is broken
+except the arrangement, and the arrangement is enough.</p>
+<p>Note the entropy figures: ECB scores high <em>and is still completely broken</em>. Entropy
+measures how evenly bytes are distributed. It cannot see that the same block keeps repeating, which
+is exactly what leaks the picture. The measurement that catches ECB is <strong>distinct block
+count</strong>.</p>
+
+<h3>CBC — chained blocks</h3>
+<p>Before encryption, each block is XORed with the previous block's ciphertext. The first block has
+no predecessor, so it is XORed with an <strong>initialisation vector</strong> instead.</p>
+<div class="out tight">C1 = encrypt(P1 ⊕ IV)
+C2 = encrypt(P2 ⊕ C1)
+C3 = encrypt(P3 ⊕ C2)   …and so on</div>
+<p>Identical plaintext blocks now produce different ciphertext, because each depends on everything
+before it. The IV need not be secret, but it must be unpredictable and must not repeat under the
+same key — otherwise two messages beginning identically produce identical opening blocks, which
+leaks exactly as much as ECB does for that prefix.</p>
+
+<h3>Padding</h3>
+<p>Because CBC and ECB work on whole blocks, the last block must be filled. The standard scheme,
+PKCS#7, appends N bytes each of value N.</p>
+<div class="out tight">…6f 70 65 6e | 04 04 04 04     four bytes short → four bytes of 0x04
+…6f 70 65 6e 21 | 03 03 03      three bytes short → three of 0x03</div>
+<p>If the message is already an exact multiple of 16, a <em>whole extra block</em> of padding is
+added, so the decryptor can always remove a non-zero amount. That is why encrypted output is
+sometimes 16 bytes larger than a size calculation would suggest.</p>
+
+<h3>CTR — turning a block cipher into a stream cipher</h3>
+<p>Instead of encrypting the data, CTR encrypts a counter and XORs the result with the data. The
+cipher becomes a keystream generator.</p>
+<div class="out tight">keystream = encrypt(nonce ‖ counter), counter incrementing
+ciphertext = plaintext ⊕ keystream</div>
+<p>Two useful consequences. Output is exactly the same size as input, with no padding. And any
+block can be decrypted without processing the ones before it, because you can jump the counter
+straight to the position you want — which makes CTR the natural choice for encrypting only parts
+of a large file, the subject of module 08.</p>
+<p>The danger is nonce reuse. Encrypt two different messages with the same key and counter and they
+share a keystream, at which point XORing the two ciphertexts together cancels the keystream
+entirely and leaves the two plaintexts combined. This is the most consequential misuse in the whole
+subject.</p>
+
+<h3>GCM — CTR with proof of integrity</h3>
+<p>GCM runs CTR mode and, alongside it, computes an authentication tag over the ciphertext. On
+decryption the tag is verified first; if it fails, nothing is returned. This is the AEAD idea from
+module 03, applied to AES.</p>
+
+<h3>XTS — for disks</h3>
+<p>Disk encryption has an unusual constraint: every sector must be encryptable and decryptable
+independently, in place, without changing size. XTS handles this by mixing the sector number into
+the encryption as a tweak, so identical sectors at different positions still encrypt differently.
+It is what BitLocker uses, and it appears again in module 10.</p>
+
+<h2>The avalanche effect</h2>
+<p>Change one bit of input and roughly half of every output bit changes. This is a design
+requirement of any decent cipher, and it is why there is no such thing as a nearly-correct key.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · one bit in, half the output changes</b><span>AES-256-CBC</span></div>
+  <div class="sim-body">
+    <div class="row"><input type="text" id="s5-in" value="Transfer 1000.00 GBP to account 4417"
+      aria-label="Text to encrypt"></div>
+    <div class="row"><label for="s5-b">Flip bit</label>
+      <input type="range" id="s5-b" min="0" max="63" value="0" style="flex:1">
+      <span class="stat" id="s5-bv"></span></div>
+    <div class="out tight" id="s5-out"></div>
+    <p class="stat" id="s5-stat"></p>
+  </div>
+</div>
+
+<div class="note">
+<p><b>What this rules out.</b> There is no partial progress against a cipher. Guessing 255 of 256
+key bits correctly produces output as wrong as guessing none of them. Brute force is not a strategy
+against a correctly used cipher — which is why every interesting question is about how the key was
+made and where it went, never about the cipher itself.</p>
+</div>
+
+<div class="done-bar" data-p="05"><p>Finished this module?</p><button type="button" aria-pressed="false">Mark as read</button></div>
+<div class="pager"><a href="04-symmetric.html"><em>Previous</em>Symmetric encryption</a><a class="nxt" href="06-asymmetric.html"><em>Next</em>Asymmetric encryption</a></div>
+<p class="kbd-hint">Use <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> to move between modules</p>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="05"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+function drawSource(ctx,w,h){
+  const dark = isDark();
+  const bg = dark ? '#14181C' : '#FCFCFA', fg = dark ? '#E7EAED' : '#191D21';
+  ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+  ctx.fillStyle=fg; ctx.fillRect(46,52,68,52);
+  ctx.lineWidth=11; ctx.strokeStyle=fg;
+  ctx.beginPath(); ctx.arc(80,52,22,Math.PI,0); ctx.stroke();
+  ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(80,72,8,0,Math.PI*2); ctx.fill();
+  ctx.fillRect(76,72,8,20);
+}
+async function s4run(){
+  const w=160,h=120;
+  const src=document.getElementById('s4-src'); if(!src) return;
+  const sc=src.getContext('2d'); drawSource(sc,w,h);
+  const img=sc.getImageData(0,0,w,h), n=w*h, pad=(16-(n%16))%16;
+  const gray=new Uint8Array(n+pad);
+  for(let i=0;i<n;i++) gray[i]=img.data[i*4];
+  const k=await demoKeyBytes('module-05-image');
+  const ecb=await aesECB(gray,k), cbc=await aesCBC(gray,k,new Uint8Array(16));
+  const paint=(id,d)=>{const c=document.getElementById(id),x=c.getContext('2d');
+    const o=x.createImageData(w,h);
+    for(let i=0;i<n;i++){o.data[i*4]=o.data[i*4+1]=o.data[i*4+2]=d[i];o.data[i*4+3]=255;}
+    x.putImageData(o,0,0);};
+  paint('s4-ecb',ecb); paint('s4-cbc',cbc);
+  const total=Math.floor(gray.length/16);
+  document.getElementById('s4-stats').innerHTML =
+    'plaintext entropy <b>'+shannon(gray).toFixed(2)+'</b><br>'+
+    'ECB entropy <b>'+shannon(ecb).toFixed(2)+'</b><br>'+
+    'CBC entropy <b>'+shannon(cbc).toFixed(2)+'</b><br><br>'+
+    'distinct 16-byte blocks<br>ECB <b class="c-cipher">'+distinctBlocks(ecb)+'</b> of '+total+
+    '<br>CBC <b class="c-plain">'+distinctBlocks(cbc)+'</b> of '+total;
+  describe('s4-a11y','A padlock image encrypted twice with the same AES-256 key. Under ECB the '+
+    'padlock shape remains clearly visible because only '+distinctBlocks(ecb)+' of '+total+
+    ' blocks are distinct. Under CBC it is unreadable noise, with all '+distinctBlocks(cbc)+
+    ' blocks distinct.');
+}
+s4run();
+document.addEventListener('themechange', s4run);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', s4run);
+
+async function s5run(){
+  const v=document.getElementById('s5-in').value;
+  const bit=+document.getElementById('s5-b').value;
+  const a=bytes(v); const b=new Uint8Array(a);
+  const byteI=Math.floor(bit/8)%b.length;
+  b[byteI]^=(1<<(bit%8));
+  document.getElementById('s5-bv').textContent='byte '+byteI+', bit '+(bit%8);
+  const k=await demoKeyBytes('module-05-av'), iv=new Uint8Array(16);
+  const ca=await aesCBC(a,k,iv), cb=await aesCBC(b,k,iv);
+  let diffBits=0,diffBytes=0;
+  for(let i=0;i<Math.min(ca.length,cb.length);i++){
+    const x=ca[i]^cb[i]; if(x) diffBytes++;
+    for(let j=0;j<8;j++) if(x&(1<<j)) diffBits++;
+  }
+  const tot=Math.min(ca.length,cb.length)*8;
+  document.getElementById('s5-out').textContent =
+    'input A   '+hex(a.slice(0,16))+'\n'+
+    'input B   '+hex(b.slice(0,16))+'   ← one bit different\n\n'+
+    'cipher A  '+hex(ca.slice(0,16))+'\n'+
+    'cipher B  '+hex(cb.slice(0,16));
+  document.getElementById('s5-stat').textContent =
+    'bytes changed '+diffBytes+' of '+Math.min(ca.length,cb.length)+
+    '   ·   bits changed '+diffBits+' of '+tot+'  ('+(diffBits/tot*100).toFixed(1)+'%)';
+}
+document.getElementById('s5-b').addEventListener('input',s5run);
+document.getElementById('s5-in').addEventListener('input',s5run);
+s5run();
+</script>
+</body>
+</html>

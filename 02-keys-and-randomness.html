@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keys and randomness — Evil Encryption Academy</title>
+<meta name="description" content="Every cipher on this site is public. The key is the only secret, which makes where that key came from the most consequential question you can ask about any">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Evil Encryption Academy">
+<meta property="og:title" content="Keys and randomness">
+<meta property="og:description" content="Every cipher on this site is public. The key is the only secret, which makes where that key came from the most consequential question you can ask about any">
+<meta property="og:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Keys and randomness">
+<meta name="twitter:description" content="Every cipher on this site is public. The key is the only secret, which makes where that key came from the most consequential question you can ask about any">
+<meta name="twitter:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+<script>
+/* Apply the stored theme before first paint so the page never flashes the wrong one. */
+(function(){try{var t=localStorage.getItem('eea-theme');
+if(t&&t!=='system')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<button class="menu-btn ghost" aria-controls="sidenav" aria-expanded="false">Menu</button>
+<div class="shell">
+<aside class="side" id="sidenav">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<div class="prog">
+  <div class="prog-bar"><div class="prog-fill"></div></div>
+  <p class="prog-txt"><span class="prog-count">0 of 11 read</span>
+    <button class="prog-reset" type="button">reset</button></p>
+</div>
+<nav>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <h4>Foundations</h4>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-keys-and-randomness.html" data-p="02"><i>02</i>Keys and randomness</a>
+  <a href="03-hashing-and-integrity.html" data-p="03"><i>03</i>Hashing and integrity</a>
+  <h4>The two families</h4>
+  <a href="04-symmetric.html" data-p="04"><i>04</i>Symmetric encryption</a>
+  <a href="05-modes.html" data-p="05"><i>05</i>Modes of operation</a>
+  <a href="06-asymmetric.html" data-p="06"><i>06</i>Asymmetric encryption</a>
+  <h4>Ransomware encryption</h4>
+  <a href="07-hybrid.html" data-p="07"><i>07</i>The hybrid scheme</a>
+  <a href="08-coverage.html" data-p="08"><i>08</i>How much gets encrypted</a>
+  <a href="09-key-models.html" data-p="09"><i>09</i>Key models</a>
+  <a href="10-os-native.html" data-p="10"><i>10</i>OS-native encryption</a>
+  <h4>Putting it together</h4>
+  <a href="11-telling-them-apart.html" data-p="11"><i>11</i>Telling them apart</a>
+  <a href="reference.html" data-p="ref"><i>—</i>Reference</a>
+</nav>
+<div class="side-foot">
+  <button class="theme-btn" type="button">System theme</button>
+</div>
+</aside>
+<main id="content">
+<p class="crumb"><span>Foundations · 02</span><span>7 min read</span></p>
+<h1>Keys and randomness</h1>
+<p class="lede">Every cipher on this site is public. The key is the only secret, which makes where that key came from the most consequential question you can ask about any scheme.</p>
+
+<h2>What a key actually is</h2>
+<p>A key is a number. Not a password, not a phrase — a number, usually written as a run of bytes.
+An AES-256 key is 32 bytes, which is a number between zero and roughly 1.2 × 10<sup>77</sup>.</p>
+<div class="out tight">3f 8a 1c 04 9b 27 ee 51 6d 0a 44 77 c1 e9 b3 82
+7a 55 20 cf 18 4e 9d 6b 03 f2 8c 31 a0 db 56 74</div>
+<p>There is nothing special about that particular number. Any other 32 bytes would work equally
+well. What makes it a good key is not its content but the fact that nobody else can predict it.</p>
+
+<h2>Key size, and why the numbers stop mattering</h2>
+<p>Key size determines how many values an attacker would have to try. Each additional bit doubles
+that count, so the growth is not gradual — it falls off a cliff.</p>
+
+<figure role="img" aria-label="Logarithmic bar chart of key space sizes, from a 4-digit PIN at ten thousand possibilities up to a 256-bit key at 1.2 times ten to the seventy-seventh."><svg viewBox="0 0 700 270" xmlns="http://www.w3.org/2000/svg">
+<text x="24" y="32" font-size="14" font-weight="600">How many keys an attacker would have to try</text>
+<text class="m" x="24" y="74" font-size="12">4-digit PIN</text><rect class="box-c" x="160" y="56" width="14" height="26" rx="3"/><text class="lbl m" x="186" y="74" font-size="11">10 thousand</text><text class="tiny" x="530" y="74">instant</text><text class="m" x="24" y="114" font-size="12">8-char password</text><rect class="box-c" x="160" y="96" width="88" height="26" rx="3"/><text class="lbl m" x="260" y="114" font-size="11">~6 quadrillion</text><text class="tiny" x="530" y="114">hours to days</text><text class="m" x="24" y="154" font-size="12">56-bit DES key</text><rect class="box-c" x="160" y="136" width="102" height="26" rx="3"/><text class="lbl m" x="274" y="154" font-size="11">72 quadrillion</text><text class="tiny" x="530" y="154">hours, since 1998</text><text class="m" x="24" y="194" font-size="12">128-bit key</text><rect class="box-p" x="160" y="176" width="211" height="26" rx="3"/><text class="lbl m" x="383" y="194" font-size="11">3.4 × 10³⁸</text><text class="tiny" x="530" y="194">not reachable</text><text class="m" x="24" y="234" font-size="12">256-bit key</text><rect class="box-p" x="160" y="216" width="340" height="26" rx="3"/><text class="lbl m" x="512" y="234" font-size="11">1.2 × 10⁷⁷</text><text class="tiny" x="530" y="234">not reachable</text>
+<text class="tiny" x="24" y="252">Bars are logarithmic — a linear scale could not show both ends on one page.</text>
+</svg><figcaption>Above roughly 128 bits the number stops being a difficulty and becomes a physical impossibility. Which is why attacks target key handling instead.</figcaption></figure>
+
+<p>A 128-bit key has about 3.4 × 10<sup>38</sup> possible values. To put that in physical terms:
+if every computer on Earth tested a billion keys per second, and had been doing so since the
+formation of the planet, the search would not be measurably closer to finished.</p>
+<p>This is why the question "how long would it take to brute-force AES-256?" has no useful answer.
+It is not a difficult problem, it is an impossible one, and no amount of hardware changes that. The
+consequence is important: <strong>nobody attacks the key space.</strong> They attack how the key
+was produced, stored or handled — which is the rest of this module.</p>
+
+<table>
+<tr><th>Key size</th><th>Used by</th><th>Status</th></tr>
+<tr><td>56-bit</td><td>DES</td><td>Broken in practice since the 1990s</td></tr>
+<tr><td>128-bit</td><td>AES-128</td><td>Considered secure</td></tr>
+<tr><td>256-bit</td><td>AES-256, ChaCha20</td><td>Considered secure with margin</td></tr>
+<tr><td>2048-bit</td><td>RSA</td><td>Secure; not comparable to symmetric sizes</td></tr>
+<tr><td>256-bit</td><td>Elliptic curve</td><td>Roughly equal to RSA-3072</td></tr>
+</table>
+
+<div class="note">
+<p><b>Do not compare key sizes across families.</b> A 256-bit AES key and a 256-bit RSA key are not
+remotely comparable — RSA-256 would be broken in seconds. The numbers measure different things,
+because the underlying problems are different. Asymmetric keys must be far larger to reach the same
+strength, which is covered in module 06.</p>
+</div>
+
+<h2>Where keys come from</h2>
+<p>This is the question that decides everything. The same AES-256 encryption can be effectively
+unbreakable or trivially undone depending entirely on how the key was generated.</p>
+
+<figure role="img" aria-label="Diagram showing four key origins and their resulting strength: a secure random generator is unpredictable, a password with a slow derivation function is only as strong as the password, a timestamp or process ID yields a searchable space, and a hardcoded key is a single readable value."><svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+<text x="24" y="34" font-size="14" font-weight="600">The same AES-256 cipher, four different key origins</text>
+<rect class="box-p" x="24" y="58" width="230" height="34" rx="4"/><text x="139" y="80" text-anchor="middle" font-size="12.5">Secure random generator</text><path class="arrow" d="M262 75 h30" marker-end="url(#ah4)"/><text class="m" x="302" y="72" font-size="11.5">unpredictable</text><text class="tiny" x="302" y="87">no shortcut exists</text><rect class="box-k" x="24" y="108" width="230" height="34" rx="4"/><text x="139" y="130" text-anchor="middle" font-size="12.5">Password + slow KDF</text><path class="arrow" d="M262 125 h30" marker-end="url(#ah4)"/><text class="m" x="302" y="122" font-size="11.5">as strong as the password</text><text class="tiny" x="302" y="137">guessable if weak</text><rect class="box-c" x="24" y="158" width="230" height="34" rx="4"/><text x="139" y="180" text-anchor="middle" font-size="12.5">Timestamp or process ID</text><path class="arrow" d="M262 175 h30" marker-end="url(#ah4)"/><text class="m" x="302" y="172" font-size="11.5">a few million options</text><text class="tiny" x="302" y="187">searchable</text><rect class="box-c" x="24" y="208" width="230" height="34" rx="4"/><text x="139" y="230" text-anchor="middle" font-size="12.5">Hardcoded in the software</text><path class="arrow" d="M262 225 h30" marker-end="url(#ah4)"/><text class="m" x="302" y="222" font-size="11.5">one value</text><text class="tiny" x="302" y="237">read it out</text>
+<text class="tiny" x="24" y="272">The cipher is identical in all four cases. Only the origin of the key differs.</text>
+<defs><marker id="ah4" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+<path d="M0 0 L7 3.5 L0 7 z" fill="currentColor" class="lbl"/></marker></defs>
+</svg><figcaption>A scheme is only as strong as the weakest step that produced its key. Naming the cipher tells you almost nothing on its own.</figcaption></figure>
+
+<h3>Secure random generation</h3>
+<p>A cryptographically secure pseudo-random number generator (CSPRNG) produces output that cannot
+be predicted even by someone who knows the algorithm and has seen previous output. Operating
+systems provide one, seeded from genuinely unpredictable physical sources — timing jitter,
+interrupt patterns, hardware noise.</p>
+<p>This is the correct source for an encryption key, and it is what any competent scheme uses. When
+a key comes from here, there is no shortcut. The only route to the plaintext is the key itself.</p>
+
+<h3>Ordinary random generators are not the same thing</h3>
+<p>A general-purpose random function — the kind used to shuffle a list or pick a colour — is
+designed to be fast and statistically even, not unpredictable. Given a few outputs, its internal
+state can often be reconstructed, and once you have the state you have every value it will ever
+produce.</p>
+<p>The classic failure is seeding from the clock. If a key is generated from the current time in
+seconds, and you know roughly when it happened, the search space collapses from 2<sup>256</sup> to
+a few thousand. That is not cryptography, it is a lookup.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · predictable versus unpredictable</b><span>see the search space collapse</span></div>
+  <div class="sim-body">
+    <p>Both produce 32 bytes that look equally random. Only one of them is.</p>
+    <div class="row">
+      <label for="s-src">Key source</label>
+      <select id="s-src">
+        <option value="csprng">Secure random generator</option>
+        <option value="time">Seeded from the clock</option>
+      </select>
+      <button id="s-gen">Generate a key</button>
+    </div>
+    <div class="out tight" id="s-key"></div>
+    <div class="out" id="s-analysis"></div>
+  </div>
+</div>
+
+<h3>Keys derived from passwords</h3>
+<p>Sometimes a key has to come from something a human can remember. A password is not a key — it is
+short, drawn from a small alphabet and often guessable — so it must be stretched into one by a
+<strong>key derivation function</strong>.</p>
+<p>A KDF does two things. It converts arbitrary input into a fixed-size key, and it is deliberately
+slow, so that testing each guess costs real time. PBKDF2, scrypt and Argon2 are the common choices,
+and they can be tuned so that a single derivation takes a noticeable fraction of a second.</p>
+<div class="out tight">password  →  [ KDF, deliberately slow ]  →  256-bit key
+                        ↑
+                  salt + iteration count</div>
+<p>The <strong>salt</strong> is a random value stored alongside the result. It ensures that two
+people with the same password get different keys, which prevents an attacker precomputing a table
+of answers once and reusing it against everyone.</p>
+<p>A KDF cannot make a weak password strong. If the password is in a wordlist, a slow KDF only
+means the attacker's list takes longer to work through. What it changes is the cost per guess, and
+that is often decisive.</p>
+
+<h2>Nonces and initialisation vectors</h2>
+<p>Keys are not the only values a cipher needs. Most schemes also take a second input — called an
+IV or a nonce depending on the mode — that makes each encryption unique even when the key is
+reused.</p>
+<table>
+<tr><th></th><th>Key</th><th>IV / nonce</th></tr>
+<tr><td>Secret?</td><td><strong>Yes, always</strong></td><td>No — usually stored in the open</td></tr>
+<tr><td>Reusable?</td><td>Yes, across many messages</td><td><strong>Never with the same key</strong></td></tr>
+<tr><td>Typical size</td><td>16 or 32 bytes</td><td>12 or 16 bytes</td></tr>
+<tr><td>If it repeats</td><td>Fine, by design</td><td>Depends on the mode — sometimes catastrophic</td></tr>
+</table>
+<p>The rule that matters: <strong>a nonce must never repeat under the same key</strong>. It may be
+public, predictable, even a simple counter — but it must be unique. Module 05 shows exactly what
+breaks when this is violated, and module 09 shows a case where an apparently reused nonce is
+perfectly safe because the key never repeats.</p>
+
+<h2>Why this module exists</h2>
+<p>Everything that follows assumes a key exists and is secret. That assumption is doing enormous
+work, and it is the part of a real scheme most likely to be wrong.</p>
+<p>When you are looking at any encryption scheme — in a product, in a protocol, or in ransomware —
+the productive questions are not about the cipher. They are:</p>
+<ul>
+  <li>Where did the key come from, and could that source be predicted or reproduced?</li>
+  <li>Was it used once, or reused across many things?</li>
+  <li>Where did it go afterwards — is a copy still somewhere?</li>
+  <li>Was the nonce unique for every use of that key?</li>
+</ul>
+
+<div class="note">
+<p><b>The thread running through this course.</b> Ciphers are essentially never broken. Key handling
+is broken constantly. When you read that some encryption scheme "was defeated", the story is
+almost always about one of the four questions above and almost never about mathematics.</p>
+</div>
+
+<div class="done-bar" data-p="02"><p>Finished this module?</p><button type="button" aria-pressed="false">Mark as read</button></div>
+<div class="pager"><a href="01-what-encryption-is.html"><em>Previous</em>What encryption is</a><a class="nxt" href="03-hashing-and-integrity.html"><em>Next</em>Hashing and integrity</a></div>
+<p class="kbd-hint">Use <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> to move between modules</p>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="02"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+async function keyGen(){
+  const src=document.getElementById('s-src').value;
+  let k, analysis;
+  if(src==='csprng'){
+    k = crypto.getRandomValues(new Uint8Array(32));
+    analysis =
+      'SOURCE   operating system secure random generator\n\n'+
+      'Possible values   ~1.2 × 10^77\n'+
+      'Reproducible?     no — not even by the machine that made it\n'+
+      'Attack            none available. The key must be obtained, not guessed.\n\n'+
+      'Press generate again: the result is completely different every time,\n'+
+      'and knowing this one tells you nothing about the next.';
+  } else {
+    // key derived from the current second - the classic weak-seeding pattern
+    const secs = Math.floor(Date.now()/1000);
+    k = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes('seed:'+secs)));
+    analysis =
+      'SOURCE   SHA-256 of the current time, in seconds\n\n'+
+      'Seed used         '+secs+'\n'+
+      'Possible values   one per second\n'+
+      'Reproducible?     yes — anyone who knows the second reproduces it exactly\n\n'+
+      'If an attacker knows the encryption happened within a given day,\n'+
+      'the search is 86,400 candidates. A laptop finishes that instantly.\n\n'+
+      'The bytes below look exactly as random as the secure ones. Output\n'+
+      'appearance tells you nothing about key strength.';
+  }
+  document.getElementById('s-key').textContent =
+    hex(k).replace(/(.{32})/g,'$1\n').trim();
+  document.getElementById('s-analysis').textContent = analysis;
+}
+document.getElementById('s-gen').addEventListener('click', keyGen);
+document.getElementById('s-src').addEventListener('change', keyGen);
+keyGen();
+</script>
+</body>
+</html>
