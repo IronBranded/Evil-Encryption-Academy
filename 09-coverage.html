@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How much gets encrypted — Evil Encryption Academy</title>
+<meta name="description" content="Encrypting an entire file server takes hours. Breaking every file on it takes minutes. Modern families exploit that gap, and it produces four patterns you ">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Evil Encryption Academy">
+<meta property="og:title" content="How much gets encrypted">
+<meta property="og:description" content="Encrypting an entire file server takes hours. Breaking every file on it takes minutes. Modern families exploit that gap, and it produces four patterns you ">
+<meta property="og:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How much gets encrypted">
+<meta name="twitter:description" content="Encrypting an entire file server takes hours. Breaking every file on it takes minutes. Modern families exploit that gap, and it produces four patterns you ">
+<meta name="twitter:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+<script>
+/* Apply the stored theme before first paint so the page never flashes the wrong one. */
+(function(){try{var t=localStorage.getItem('eea-theme');
+if(t&&t!=='system')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<button class="menu-btn ghost" aria-controls="sidenav" aria-expanded="false">Menu</button>
+<div class="shell">
+<aside class="side" id="sidenav">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<div class="prog">
+  <div class="prog-bar"><div class="prog-fill"></div></div>
+  <p class="prog-txt"><span class="prog-count">0 of 13 read</span>
+    <button class="prog-reset" type="button">reset</button></p>
+</div>
+<nav>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <h4>Foundations</h4>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-keys-and-randomness.html" data-p="02"><i>02</i>Keys and randomness</a>
+  <a href="03-hashing-and-integrity.html" data-p="03"><i>03</i>Hashing and integrity</a>
+  <h4>The two families</h4>
+  <a href="04-symmetric.html" data-p="04"><i>04</i>Symmetric encryption</a>
+  <a href="05-modes.html" data-p="05"><i>05</i>Modes of operation</a>
+  <a href="06-asymmetric.html" data-p="06"><i>06</i>Asymmetric encryption</a>
+  <h4>Implementation</h4>
+  <a href="07-implementation.html" data-p="07"><i>07</i>Where the cryptography runs</a>
+  <h4>Ransomware encryption</h4>
+  <a href="08-hybrid.html" data-p="08"><i>08</i>The hybrid scheme</a>
+  <a href="09-coverage.html" data-p="09"><i>09</i>How much gets encrypted</a>
+  <a href="10-key-models.html" data-p="10"><i>10</i>Key models</a>
+  <a href="11-os-native.html" data-p="11"><i>11</i>OS-native encryption</a>
+  <a href="12-hypervisor.html" data-p="12"><i>12</i>Hypervisor encryption</a>
+  <h4>Putting it together</h4>
+  <a href="13-telling-them-apart.html" data-p="13"><i>13</i>Telling them apart</a>
+  <a href="reference.html" data-p="ref"><i>—</i>Reference</a>
+</nav>
+<div class="side-foot">
+  <button class="theme-btn" type="button">System theme</button>
+</div>
+</aside>
+<main id="content">
+<p class="crumb"><span>Ransomware encryption · 09</span><span>7 min read</span></p>
+<h1>How much gets encrypted</h1>
+<p class="lede">Encrypting an entire file server takes hours. Breaking every file on it takes minutes. Modern families exploit that gap, and it produces four patterns you can see directly in the output.</p>
+
+<h2>The insight being exploited</h2>
+<p>You do not need to encrypt a file to make it unusable. You need to break its
+<strong>structure</strong>. A database with its header and a few interior pages scrambled will not
+mount. A VM disk with its descriptor damaged will not boot. An archive with its index destroyed
+cannot be opened. The remaining bytes are irrelevant to whether the file works.</p>
+<p>So families encrypt less and finish faster. It is a speed optimisation, and it produces four
+recognisable patterns.</p>
+
+<h2>The four patterns</h2>
+
+<figure role="img" aria-label="Four horizontal bars showing coverage patterns across a file: full encryption covers everything, header-only covers the start, intermittent alternates in bands, and distributed chunks cover the start, middle and end."><svg viewBox="0 0 700 290" xmlns="http://www.w3.org/2000/svg">
+<text x="30" y="24" font-size="14" font-weight="600">The four coverage patterns, across one file</text>
+<text class="m" x="30" y="37" font-size="12" font-weight="600">Full</text><rect class="box-c" x="30" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="43" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="56" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="69" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="82" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="95" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="108" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="121" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="134" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="147" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="160" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="173" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="186" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="199" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="212" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="225" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="238" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="251" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="264" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="277" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="290" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="303" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="316" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="329" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="342" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="355" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="368" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="381" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="394" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="407" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="420" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="433" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="446" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="459" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="472" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="485" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="498" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="511" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="524" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="537" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="550" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="563" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="576" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="589" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="602" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="615" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="628" y="44" width="11" height="26" rx="2"/><rect class="box-c" x="641" y="44" width="11" height="26" rx="2"/><text class="lbl m" x="668" y="62" font-size="11">100%</text><text class="m" x="30" y="99" font-size="12" font-weight="600">Header-only</text><rect class="box-c" x="30" y="106" width="11" height="26" rx="2"/><rect class="box-c" x="43" y="106" width="11" height="26" rx="2"/><rect class="box-c" x="56" y="106" width="11" height="26" rx="2"/><rect class="box-c" x="69" y="106" width="11" height="26" rx="2"/><rect class="box-c" x="82" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="95" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="108" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="121" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="134" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="147" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="160" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="173" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="186" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="199" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="212" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="225" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="238" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="251" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="264" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="277" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="290" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="303" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="316" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="329" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="342" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="355" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="368" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="381" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="394" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="407" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="420" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="433" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="446" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="459" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="472" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="485" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="498" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="511" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="524" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="537" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="550" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="563" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="576" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="589" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="602" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="615" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="628" y="106" width="11" height="26" rx="2"/><rect class="box-p" x="641" y="106" width="11" height="26" rx="2"/><text class="lbl m" x="668" y="124" font-size="11">10%</text><text class="m" x="30" y="161" font-size="12" font-weight="600">Intermittent</text><rect class="box-c" x="30" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="43" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="56" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="69" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="82" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="95" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="108" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="121" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="134" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="147" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="160" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="173" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="186" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="199" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="212" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="225" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="238" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="251" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="264" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="277" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="290" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="303" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="316" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="329" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="342" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="355" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="368" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="381" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="394" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="407" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="420" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="433" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="446" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="459" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="472" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="485" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="498" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="511" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="524" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="537" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="550" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="563" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="576" y="168" width="11" height="26" rx="2"/><rect class="box-c" x="589" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="602" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="615" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="628" y="168" width="11" height="26" rx="2"/><rect class="box-p" x="641" y="168" width="11" height="26" rx="2"/><text class="lbl m" x="668" y="186" font-size="11">50%</text><text class="m" x="30" y="223" font-size="12" font-weight="600">Distributed chunks</text><rect class="box-c" x="30" y="230" width="11" height="26" rx="2"/><rect class="box-c" x="43" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="56" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="69" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="82" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="95" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="108" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="121" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="134" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="147" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="160" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="173" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="186" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="199" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="212" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="225" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="238" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="251" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="264" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="277" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="290" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="303" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="316" y="230" width="11" height="26" rx="2"/><rect class="box-c" x="329" y="230" width="11" height="26" rx="2"/><rect class="box-c" x="342" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="355" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="368" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="381" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="394" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="407" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="420" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="433" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="446" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="459" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="472" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="485" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="498" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="511" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="524" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="537" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="550" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="563" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="576" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="589" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="602" y="230" width="11" height="26" rx="2"/><rect class="box-p" x="615" y="230" width="11" height="26" rx="2"/><rect class="box-c" x="628" y="230" width="11" height="26" rx="2"/><rect class="box-c" x="641" y="230" width="11" height="26" rx="2"/><text class="lbl m" x="668" y="248" font-size="11">12%</text>
+<text class="tiny" x="30" y="282">red = encrypted   ·   green = untouched   ·   left edge is the start of the file</text>
+</svg><figcaption>Each pattern draws a different shape, and the shape is visible from the encrypted file alone.</figcaption></figure>
+
+<table>
+<tr><th>Pattern</th><th>What is encrypted</th><th>Why it is chosen</th></tr>
+<tr><td><strong>Full</strong></td><td>Every byte</td><td>Simple and thorough; slow on large files</td></tr>
+<tr><td><strong>Header-only</strong></td><td>The first few kilobytes</td><td>Fastest possible; most formats die without a header</td></tr>
+<tr><td><strong>Intermittent</strong></td><td>Alternating bands throughout</td><td>Damage spread evenly at a fraction of the I/O</td></tr>
+<tr><td><strong>Distributed chunks</strong></td><td>Regions at start, middle and end</td><td>Targets header, index and trailer structures specifically</td></tr>
+</table>
+
+<h3>Two patterns at once is normal</h3>
+<p>A single incident frequently shows more than one pattern, split by file size. Fast modes usually
+apply only above a threshold — often 1 MB — because the bookkeeping is not worth it on a small
+file. So small documents get fully encrypted while large databases get a few percent.</p>
+<p>Concluding "this family uses intermittent encryption" from one sample is therefore unreliable.
+The behaviour is conditional, and the condition is usually size.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · coverage explorer</b><span>real AES on the encrypted regions</span></div>
+  <div class="sim-body">
+    <div class="row">
+      <label for="s8-mode">Pattern</label>
+      <select id="s8-mode">
+        <option value="full">Full encryption</option>
+        <option value="header">Header-only</option>
+        <option value="inter" selected>Intermittent bands</option>
+        <option value="chunk">Distributed chunks</option>
+      </select>
+      <label for="s8-pct">Coverage</label>
+      <input type="range" id="s8-pct" min="1" max="100" value="20" style="flex:1">
+      <span class="stat" id="s8-pctv"></span>
+    </div>
+    <p class="stat">File map — each cell is a slice of the file</p>
+    <div class="out tight" id="s8-map" style="font-size:15px;line-height:1.35"></div>
+    <p class="stat">Entropy profile — measured per slice</p>
+    <div class="out tight" id="s8-prof" style="font-size:15px;line-height:1.35"></div>
+    <p class="stat" id="s8-stat"></p>
+  </div>
+</div>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · entropy visualiser</b><span>real AES, 256-byte resolution</span></div>
+  <div class="sim-body">
+    <p>Pick a file type and watch how its entropy profile changes under each coverage pattern.
+    Each column is 256 bytes.</p>
+    <div class="row">
+      <label for="ev-type">File type</label>
+      <select id="ev-type">
+        <option value="text">Plain text / CSV</option>
+        <option value="pdf" selected>PDF document</option>
+        <option value="exe">Executable</option>
+        <option value="png">PNG image</option>
+        <option value="jpg">JPEG photograph</option>
+      </select>
+      <label for="ev-pct">Partial coverage</label>
+      <input type="range" id="ev-pct" min="2" max="60" value="20" style="flex:1">
+      <span class="stat" id="ev-pv"></span>
+    </div>
+    <p class="sr" id="ev-a11y" role="status"></p>
+    <p class="stat"><b>Original</b> — <span id="ev-l1"></span></p>
+    <canvas id="ev-c1" width="512" height="70" style="width:100%" aria-hidden="true"></canvas>
+    <p class="stat" style="margin-top:14px"><b>Intermittently encrypted</b> — <span id="ev-l2"></span></p>
+    <canvas id="ev-c2" width="512" height="70" style="width:100%" aria-hidden="true"></canvas>
+    <p class="stat" style="margin-top:14px"><b>Fully encrypted</b> — <span id="ev-l3"></span></p>
+    <canvas id="ev-c3" width="512" height="70" style="width:100%" aria-hidden="true"></canvas>
+    <p class="stat" style="margin-top:12px">tall and dark = high entropy · short and pale = structured data</p>
+  </div>
+</div>
+
+<p>Two things are worth noticing. A JPEG or PNG already sits near the top of the scale before
+anything happens to it, so full encryption barely changes its profile — for those formats the
+entropy plot is close to useless and you must look at structure instead. A text file or an
+executable, by contrast, changes dramatically, because there was real structure to destroy.</p>
+
+<h2>Why the pattern is visible</h2>
+<p>Encrypted bytes look random; structured bytes do not. Measuring entropy across a file in slices
+rather than as a single number produces a profile, and each pattern draws a different shape.</p>
+
+<h3>Which formats survive what</h3>
+<p>Coverage percentage is only half the story. What matters is whether the encrypted regions
+happen to land on the parts of the format that carry meaning.</p>
+<table>
+<tr><th>Format</th><th>Critical structures</th><th>Effect of header-only damage</th></tr>
+<tr><td>ZIP, OOXML</td><td>Central directory, at the <em>end</em></td><td>Often survives — the index is elsewhere</td></tr>
+<tr><td>JPEG</td><td>Header, then a sequential entropy-coded stream</td><td>Fatal; everything after the damage is lost</td></tr>
+<tr><td>Database files</td><td>Header page plus per-page structures</td><td>Will not mount, though pages remain individually structured</td></tr>
+<tr><td>VM disks</td><td>Descriptor and allocation tables</td><td>Will not boot; the guest filesystem inside is independent</td></tr>
+<tr><td>Plain text, CSV, logs</td><td>None</td><td>Only the damaged region is affected</td></tr>
+</table>
+<p>This is why the same 3% coverage can be devastating for one format and barely noticeable for
+another. Formats with no global structure degrade gracefully. Formats with a single critical
+header or a sequential dependency do not.</p>
+
+<h2>Fine striping</h2>
+<p>Some designs take the idea further, encrypting very small blocks — 512 bytes — at computed
+intervals across the whole file. Total coverage stays low while damage is spread everywhere.</p>
+<div class="out tight">total bytes to encrypt = file size × percentage
+number of blocks       = total ÷ 512
+skip interval          = (file size − total) ÷ number of blocks</div>
+<p>Apply that at 10% on a 40 MB file and you get 512 encrypted bytes every 4,607. Almost every
+structure of any size in that file contains a stripe.</p>
+
+<div class="note">
+<p><b>Why fine striping is easy to miss.</b> If you measure entropy in 4 KB windows, each window
+contains roughly 512 random bytes among 3,584 plaintext ones — about 12% random, which reads as
+mostly plaintext. The file appears untouched. The pattern only becomes visible when you measure at
+a finer resolution than the stripe itself, which is a general lesson: <strong>your measurement
+window has to be smaller than the feature you are looking for.</strong></p>
+</div>
+
+<h2>Seeing it on real file types</h2>
+<p>The pattern is easiest to believe when you watch it happen to something with recognisable
+structure. Below, each strip is one file, coloured by entropy measured in 256-byte windows.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · entropy heatmap</b><span>256-byte windows, real AES-256</span></div>
+  <div class="sim-body">
+    <div class="row">
+      <label for="ev-type">File type</label>
+      <select id="ev-type">
+        <option value="text">Plain text / CSV</option>
+        <option value="pdf" selected>PDF document</option>
+        <option value="png">PNG image</option>
+        <option value="exe">Executable</option>
+        <option value="zip">ZIP archive</option>
+      </select>
+      <label for="ev-pct">Partial coverage</label>
+      <input type="range" id="ev-pct" min="2" max="60" value="15" style="flex:1">
+      <span class="stat" id="ev-pctv"></span>
+    </div>
+    <div class="row" style="margin-bottom:18px">
+      <label for="ev-file">…or use your own file</label>
+      <input type="file" id="ev-file" style="font-family:var(--sans);font-size:13px">
+    </div>
+    <p class="stat">Original</p>
+    <canvas id="ev-a" width="512" height="34" style="width:100%" aria-hidden="true"></canvas>
+    <p class="stat" id="ev-as"></p>
+    <p class="stat" style="margin-top:14px">Intermittently encrypted</p>
+    <canvas id="ev-b" width="512" height="34" style="width:100%" aria-hidden="true"></canvas>
+    <p class="stat" id="ev-bs"></p>
+    <p class="stat" style="margin-top:14px">Fully encrypted</p>
+    <canvas id="ev-c" width="512" height="34" style="width:100%" aria-hidden="true"></canvas>
+    <p class="stat" id="ev-cs"></p>
+    <p class="cap" style="margin-top:12px">
+      <span class="c-plain">green</span> low entropy, structured &nbsp;·&nbsp;
+      <span class="c-key">amber</span> mixed &nbsp;·&nbsp;
+      <span class="c-cipher">red</span> high entropy, indistinguishable from random</p>
+    <p class="sr" id="ev-a11y" role="status"></p>
+    <p class="stat" style="margin-top:12px">Your file is read in the browser and never uploaded
+      anywhere. Only the first 128 KB is used.</p>
+  </div>
+</div>
+
+<p>Two things are worth noticing as you switch types. The <strong>original</strong> strips differ
+enormously — plain text is uniformly green, a PDF is mostly green with red bands where compressed
+streams sit, and a ZIP is almost entirely red before anything is encrypted at all.</p>
+<p>And the <strong>fully encrypted</strong> strips are identical for every type. That is the point:
+once encrypted, a text file and a ZIP archive are indistinguishable. Which also means that for the
+ZIP, comparing the original and encrypted strips tells you almost nothing — the very trap module 13
+returns to.</p>
+
+<h2>Working the arithmetic</h2>
+<p>Take a 40 MB database at 10% coverage with 512-byte blocks.</p>
+<div class="out tight">file size              41,943,040 bytes
+coverage               10%
+bytes to encrypt       4,194,304
+number of blocks       4,194,304 ÷ 512  =  8,192
+bytes left untouched   37,748,736
+skip interval          37,748,736 ÷ 8,192  =  4,608 bytes</div>
+<p>So: 512 encrypted bytes, then 4,608 untouched, repeating 8,192 times across the file.</p>
+<p>Now ask what that means for the format. A database page is typically 8 KB. Every single page in
+that file spans at least one stripe. The file is 90% intact and completely unusable — which is
+exactly the outcome the design is aiming for.</p>
+<p>Change one number and the picture changes entirely. At the same 10% coverage but with 64 KB
+blocks instead of 512-byte ones, the encrypted regions are 128 large contiguous chunks, and the
+overwhelming majority of pages sit between them untouched. <strong>Block size matters as much as
+percentage</strong>, and the two are independent.</p>
+
+<h2>The trade-off</h2>
+<p>Coverage is a dial between speed and certainty. Encrypt everything and the outcome is not in
+doubt, but the operation takes hours and is visible throughout. Encrypt 1% and it finishes in
+seconds, at the cost of some files remaining usable.</p>
+<p>Neither end is obviously correct, which is why real families make it configurable and choose per
+file size. Understanding that the dial exists is more useful than memorising any particular
+setting, because the settings change between versions and the dial does not.</p>
+
+<div class="done-bar" data-p="09"><p>Finished this module?</p><button type="button" aria-pressed="false">Mark as read</button></div>
+<div class="pager"><a href="08-hybrid.html"><em>Previous</em>The hybrid scheme</a><a class="nxt" href="10-key-models.html"><em>Next</em>Key models</a></div>
+<p class="kbd-hint">Use <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> to move between modules</p>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="09"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+async function s8run(){
+  const mode=document.getElementById('s8-mode').value;
+  const pct=+document.getElementById('s8-pct').value;
+  document.getElementById('s8-pctv').textContent=pct+'%';
+  const CELLS=48, SLICE=512, N=CELLS*SLICE;
+  const rec=bytes('BEGIN RECORD; customer=ACME; amount=48200.00; status=OPEN; ');
+  const buf=new Uint8Array(N);
+  for(let i=0;i<N;i++) buf[i]=rec[i%rec.length];
+  const cells=Math.max(1,Math.round(CELLS*pct/100));
+  const encIdx=new Set();
+  if(mode==='full'){ for(let i=0;i<CELLS;i++) encIdx.add(i); }
+  else if(mode==='header'){ for(let i=0;i<cells;i++) encIdx.add(i); }
+  else if(mode==='inter'){ const step=Math.max(1,Math.round(CELLS/cells));
+    for(let i=0;i<CELLS;i+=step) encIdx.add(i); }
+  else { const per=Math.max(1,Math.round(cells/3));
+    for(let i=0;i<per;i++){ encIdx.add(i); encIdx.add(Math.floor(CELLS/2)+i); encIdx.add(CELLS-1-i); } }
+  const k=await demoKeyBytes('module-08');
+  for(const i of encIdx){
+    if(i<0||i>=CELLS) continue;
+    const ct=await aesCBC(buf.slice(i*SLICE,(i+1)*SLICE),k,new Uint8Array(16));
+    buf.set(ct.slice(0,SLICE), i*SLICE);
+  }
+  let map='',prof=''; const bars=' ▁▂▃▄▅▆▇█';
+  for(let i=0;i<CELLS;i++){
+    map += encIdx.has(i) ? '█' : '·';
+    const e=shannon(buf.slice(i*SLICE,(i+1)*SLICE))/8;
+    prof += bars[Math.min(bars.length-1,Math.round(e*(bars.length-1)))];
+  }
+  document.getElementById('s8-map').innerHTML =
+    '<span class="c-cipher">'+map.replace(/·/g,'</span><span class="c-plain">·</span><span class="c-cipher">')+'</span>';
+  document.getElementById('s8-prof').textContent = prof;
+  document.getElementById('s8-stat').textContent =
+    'encrypted '+encIdx.size+' of '+CELLS+' slices  ('+(encIdx.size*SLICE/N*100).toFixed(1)+
+    '% of the file)   ·   overall entropy '+shannon(buf).toFixed(3)+' / 8.000';
+}
+['s8-mode','s8-pct'].forEach(id=>document.getElementById(id).addEventListener('input',s8run));
+s8run();
+
+/* ---- entropy heatmap over real file structures ---- */
+const EV_N = 128*1024;
+function synth(kind){
+  const n = 96*1024, b = new Uint8Array(n);
+  const rnd = (a,z)=>{ for(let i=a;i<z&&i<n;i++) b[i]=Math.floor(Math.random()*256); };
+  const txt = (a,z)=>{ const s='BEGIN RECORD; customer=ACME; amount=48200.00; status=OPEN;\n';
+    for(let i=a;i<z&&i<n;i++) b[i]=s.charCodeAt((i-a)%s.length); };
+  if(kind==='text'){ txt(0,n); }
+  else if(kind==='pdf'){
+    // header and object tables are text; embedded streams are compressed
+    txt(0,n);
+    for(const [a,w] of [[6000,9000],[26000,14000],[58000,11000]]) rnd(a,a+w);
+    b.set([0x25,0x50,0x44,0x46,0x2d,0x31,0x2e,0x37],0);          // %PDF-1.7
+  }
+  else if(kind==='png'){
+    rnd(0,n);
+    b.set([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a],0);          // PNG magic
+    txt(8,80);                                                    // IHDR-ish header
+  }
+  else if(kind==='exe'){
+    // PE headers and import tables are structured; some sections are packed
+    txt(0,n);
+    b.set([0x4d,0x5a,0x90,0x00],0);                               // MZ
+    for(const [a,w] of [[18000,10000],[62000,17000]]) rnd(a,a+w);
+    for(let i=0;i<4000;i++) b[40000+i]=0;                          // a zeroed section
+  }
+  else { rnd(0,n); b.set([0x50,0x4b,0x03,0x04],0); }              // ZIP
+  return b;
+}
+function evColour(e){
+  // 0..1 normalised entropy -> green through amber to red
+  const t=Math.max(0,Math.min(1,(e-0.55)/0.42));
+  const g=[46,111,94], k=[176,148,60], c=[176,58,46];
+  const mix=(a,b,f)=>a.map((v,i)=>Math.round(v+(b[i]-v)*f));
+  const rgb = t<0.5 ? mix(g,k,t*2) : mix(k,c,(t-0.5)*2);
+  return `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+}
+function evPaint(id, data){
+  const c=document.getElementById(id), x=c.getContext('2d'), W=c.width, H=c.height;
+  const win=256, count=Math.floor(data.length/win);
+  x.clearRect(0,0,W,H);
+  let sum=0;
+  for(let i=0;i<count;i++){
+    const e=shannon(data.slice(i*win,(i+1)*win))/8; sum+=e;
+    x.fillStyle=evColour(e);
+    x.fillRect(Math.floor(i/count*W),0,Math.ceil(W/count)+1,H);
+  }
+  return {mean:sum/count, windows:count};
+}
+async function evRun(bytesIn){
+  const kind=document.getElementById('ev-type').value;
+  const pct=+document.getElementById('ev-pct').value;
+  document.getElementById('ev-pctv').textContent=pct+'%';
+  const orig = bytesIn || synth(kind);
+  const k=await demoKeyBytes('heatmap');
+  // fully encrypted
+  const full=await aesCBC(orig,k,new Uint8Array(16));
+  // intermittent: encrypt every Nth 4KB band to hit the requested coverage
+  const band=4096, bands=Math.floor(orig.length/band);
+  const want=Math.max(1,Math.round(bands*pct/100));
+  const step=Math.max(1,Math.round(bands/want));
+  const inter=new Uint8Array(orig);
+  for(let i=0;i<bands;i+=step){
+    const ct=await aesCBC(orig.slice(i*band,(i+1)*band),k,new Uint8Array(16));
+    inter.set(ct.slice(0,band), i*band);
+  }
+  const a=evPaint('ev-a',orig), b=evPaint('ev-b',inter), c=evPaint('ev-c',full.slice(0,orig.length));
+  const pc=v=>(v*8).toFixed(2);
+  document.getElementById('ev-as').textContent='mean entropy '+pc(a.mean)+' / 8.00   ·   '+a.windows+' windows';
+  document.getElementById('ev-bs').textContent='mean entropy '+pc(b.mean)+' / 8.00   ·   ~'+
+    Math.round(100*step>0?100/step:0)+'% of bands encrypted';
+  document.getElementById('ev-cs').textContent='mean entropy '+pc(c.mean)+' / 8.00   ·   every window at ciphertext level';
+  describe('ev-a11y','Three entropy strips. The original has mean entropy '+pc(a.mean)+
+    ' out of 8. Intermittently encrypted it rises to '+pc(b.mean)+
+    ', with alternating structured and random regions. Fully encrypted it reaches '+pc(c.mean)+
+    ', uniform across the whole file.');
+}
+document.getElementById('ev-type').addEventListener('change',()=>evRun(null));
+document.getElementById('ev-pct').addEventListener('input',()=>evRun(evUploaded));
+let evUploaded=null;
+document.getElementById('ev-file').addEventListener('change', e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ evUploaded=new Uint8Array(r.result).slice(0,EV_N); evRun(evUploaded); };
+  r.readAsArrayBuffer(f.slice(0,EV_N));
+});
+evRun(null);
+</script>
+</body>
+</html>

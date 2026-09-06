@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What encryption is — Evil Encryption Academy</title>
+<meta name="description" content="Four operations routinely get called encryption and only one of them is. Getting them apart is the most useful thing on this site, because every later idea">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Evil Encryption Academy">
+<meta property="og:title" content="What encryption is">
+<meta property="og:description" content="Four operations routinely get called encryption and only one of them is. Getting them apart is the most useful thing on this site, because every later idea">
+<meta property="og:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What encryption is">
+<meta name="twitter:description" content="Four operations routinely get called encryption and only one of them is. Getting them apart is the most useful thing on this site, because every later idea">
+<meta name="twitter:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+<script>
+/* Apply the stored theme before first paint so the page never flashes the wrong one. */
+(function(){try{var t=localStorage.getItem('eea-theme');
+if(t&&t!=='system')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<button class="menu-btn ghost" aria-controls="sidenav" aria-expanded="false">Menu</button>
+<div class="shell">
+<aside class="side" id="sidenav">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<div class="prog">
+  <div class="prog-bar"><div class="prog-fill"></div></div>
+  <p class="prog-txt"><span class="prog-count">0 of 13 read</span>
+    <button class="prog-reset" type="button">reset</button></p>
+</div>
+<nav>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <h4>Foundations</h4>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-keys-and-randomness.html" data-p="02"><i>02</i>Keys and randomness</a>
+  <a href="03-hashing-and-integrity.html" data-p="03"><i>03</i>Hashing and integrity</a>
+  <h4>The two families</h4>
+  <a href="04-symmetric.html" data-p="04"><i>04</i>Symmetric encryption</a>
+  <a href="05-modes.html" data-p="05"><i>05</i>Modes of operation</a>
+  <a href="06-asymmetric.html" data-p="06"><i>06</i>Asymmetric encryption</a>
+  <h4>Implementation</h4>
+  <a href="07-implementation.html" data-p="07"><i>07</i>Where the cryptography runs</a>
+  <h4>Ransomware encryption</h4>
+  <a href="08-hybrid.html" data-p="08"><i>08</i>The hybrid scheme</a>
+  <a href="09-coverage.html" data-p="09"><i>09</i>How much gets encrypted</a>
+  <a href="10-key-models.html" data-p="10"><i>10</i>Key models</a>
+  <a href="11-os-native.html" data-p="11"><i>11</i>OS-native encryption</a>
+  <a href="12-hypervisor.html" data-p="12"><i>12</i>Hypervisor encryption</a>
+  <h4>Putting it together</h4>
+  <a href="13-telling-them-apart.html" data-p="13"><i>13</i>Telling them apart</a>
+  <a href="reference.html" data-p="ref"><i>—</i>Reference</a>
+</nav>
+<div class="side-foot">
+  <button class="theme-btn" type="button">System theme</button>
+</div>
+</aside>
+<main id="content">
+<p class="crumb"><span>Foundations · 01</span><span>6 min read</span></p>
+<h1>What encryption is</h1>
+<p class="lede">Four operations routinely get called encryption and only one of them is. Getting them apart is the most useful thing on this site, because every later idea depends on the distinction.</p>
+
+<h2>Four operations, one of which hides things</h2>
+<table>
+<tr><th></th><th>What it does</th><th>Reversible?</th><th>Needs a key?</th><th>Hides content?</th></tr>
+<tr><td><strong>Encoding</strong></td><td>Changes representation for transport</td><td>Yes, by anyone</td><td>No</td><td>No</td></tr>
+<tr><td><strong>Hashing</strong></td><td>Produces a fixed-size fingerprint</td><td><strong>Never</strong></td><td>No</td><td>Not its job</td></tr>
+<tr><td><strong>Signing</strong></td><td>Proves who produced something</td><td>Verifiable, not reversible</td><td>Yes</td><td>No</td></tr>
+<tr><td><strong>Encryption</strong></td><td>Makes data unreadable without a key</td><td>Yes, with the key</td><td><strong>Yes</strong></td><td><strong>Yes</strong></td></tr>
+</table>
+
+<h3>Encoding is not encryption</h3>
+<p>Base64, hexadecimal, URL encoding and percent-encoding all change how data is <em>written</em>
+without changing what it <em>is</em>. There is no key. Anyone can decode them, which is the point —
+they exist so binary data can travel through channels that only accept text.</p>
+<p>When base64 appears in a ransom note or attached to an encrypted file, it is being used for
+storage, not protection. Something has usually already been encrypted, and base64 is only the
+envelope it travels in.</p>
+
+<h3>Hashing is not encryption</h3>
+<p>A hash function takes input of any length and produces a fixed-size output — 32 bytes for
+SHA-256, regardless of whether you fed it a word or a four-gigabyte video. That alone tells you the
+original cannot be recovered from it: you cannot fit four gigabytes into 32 bytes.</p>
+<p>Hashes identify and verify. They never conceal. Module 03 covers them properly, including the
+cases where a hash <em>is</em> part of an encryption scheme.</p>
+
+<h3>Signing is not encryption either</h3>
+<p>A signature proves that a particular private key was involved in producing something, and that
+it has not changed since. It answers "who made this and is it intact", not "can anyone read it".
+Signed data is usually still perfectly readable — a signed software update is not a secret.</p>
+<p>The confusion arises because signing uses the same key pairs as asymmetric encryption, run in
+the opposite direction. Module 06 covers why that works.</p>
+
+<h3>Encryption is not damage</h3>
+<p>This one matters most when explaining an incident to someone who is not technical. An encrypted
+file is completely intact. Every byte of the original is recoverable given the key. Nothing was
+deleted, nothing was corrupted — a reversible transformation was applied, and it runs backwards.</p>
+<p>The distinction is not pedantic. "Your data is destroyed" and "your data is intact but locked"
+describe different situations and lead to different decisions.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · the three transforms</b><span>Web Crypto, real AES-256</span></div>
+  <div class="sim-body">
+    <p>Type anything. Each transform runs on the same input, then each is asked to reverse.</p>
+    <div class="row"><input type="text" id="s1-in" value="Transfer 48200.00 to account 4417"
+      aria-label="Text to transform"></div>
+    <div class="row"><button id="s1-go">Transform</button>
+      <button class="ghost" id="s1-rev">Try to reverse each</button></div>
+    <table style="margin-top:6px">
+      <tr><th>Transform</th><th>Output</th></tr>
+      <tr><td>Base64<br><span class="stat">encoding</span></td><td><div class="out" id="s1-b64" style="margin:0"></div></td></tr>
+      <tr><td>SHA-256<br><span class="stat">hashing</span></td><td><div class="out" id="s1-sha" style="margin:0"></div></td></tr>
+      <tr><td>AES-256-CBC<br><span class="stat">encryption</span></td><td><div class="out" id="s1-aes" style="margin:0"></div></td></tr>
+    </table>
+    <div class="out" id="s1-rout" style="margin-top:14px">Press "Try to reverse each" to see which survive the round trip.</div>
+    <p class="stat" id="s1-key"></p>
+  </div>
+</div>
+
+<p>Notice the hash length never changes no matter how much you type. That is the property that
+makes reversal impossible, and it is visible directly.</p>
+
+<h2>What a cipher actually is</h2>
+<p>A cipher is a pair of functions. One takes a key and a message and produces ciphertext. The
+other takes the same key (or its partner) and the ciphertext, and returns the message. That is the
+whole contract.</p>
+<div class="out tight">encrypt(key, plaintext)  → ciphertext
+decrypt(key, ciphertext) → plaintext</div>
+<p>Everything interesting in cryptography is about how those two functions are constructed so that
+without the key, the second one is not merely difficult but computationally hopeless.</p>
+
+<h3>The security lives in the key, not the algorithm</h3>
+<p>This principle is old enough to have a name — Kerckhoffs's principle, stated in 1883 — and it
+governs how every modern cipher is designed. A cryptosystem should remain secure even if everything
+about it except the key is public knowledge.</p>
+<p>AES is public. Its specification is a free download; its reference implementations are on
+GitHub; the exact sequence of operations is in this course. None of that helps you read AES
+ciphertext, because none of it is the secret. The key is.</p>
+<p>This has a direct consequence for ransomware. You can obtain the malware, disassemble it
+completely, and understand every instruction — and still not be able to decrypt a single file.
+The algorithm was never the secret. Understanding the software tells you <em>how</em> the scheme
+works, which is exactly what this course teaches, and it does not hand you the key.</p>
+
+<div class="note">
+<p><b>The practical version.</b> When you read that a family "uses AES-256", you have learned
+something about the design and nothing about whether anything can be recovered. Recovery depends on
+where the key came from and where it went — the subject of modules 02 and 10.</p>
+</div>
+
+<h2>XOR: the operation underneath everything</h2>
+<p>XOR compares two bits and returns 1 when they differ. It is the simplest operation in
+cryptography and the one every cipher on this site eventually performs.</p>
+
+<figure role="img" aria-label="Truth table for XOR, and a diagram showing that applying XOR twice with the same key returns the original plaintext."><svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg">
+<text x="40" y="34" font-size="14" font-weight="600">XOR returns 1 only when the inputs differ</text>
+<text class="lbl m" x="63" y="62" text-anchor="middle">a</text>
+<text class="lbl m" x="121" y="62" text-anchor="middle">b</text>
+<text class="lbl m" x="201" y="62" text-anchor="middle">out</text>
+<rect class="box" x="40" y="74" width="46" height="26" rx="3"/><text class="m" x="63" y="92" text-anchor="middle" font-size="14">0</text><rect class="box" x="98" y="74" width="46" height="26" rx="3"/><text class="m" x="121" y="92" text-anchor="middle" font-size="14">0</text><text class="lbl m" x="160" y="92" text-anchor="middle">=</text><rect class="box" x="178" y="74" width="46" height="26" rx="3"/><text class="m" x="201" y="92" text-anchor="middle" font-size="14" font-weight="600">0</text><rect class="box" x="40" y="108" width="46" height="26" rx="3"/><text class="m" x="63" y="126" text-anchor="middle" font-size="14">0</text><rect class="box" x="98" y="108" width="46" height="26" rx="3"/><text class="m" x="121" y="126" text-anchor="middle" font-size="14">1</text><text class="lbl m" x="160" y="126" text-anchor="middle">=</text><rect class="box-c" x="178" y="108" width="46" height="26" rx="3"/><text class="m" x="201" y="126" text-anchor="middle" font-size="14" font-weight="600">1</text><rect class="box" x="40" y="142" width="46" height="26" rx="3"/><text class="m" x="63" y="160" text-anchor="middle" font-size="14">1</text><rect class="box" x="98" y="142" width="46" height="26" rx="3"/><text class="m" x="121" y="160" text-anchor="middle" font-size="14">0</text><text class="lbl m" x="160" y="160" text-anchor="middle">=</text><rect class="box-c" x="178" y="142" width="46" height="26" rx="3"/><text class="m" x="201" y="160" text-anchor="middle" font-size="14" font-weight="600">1</text><rect class="box" x="40" y="176" width="46" height="26" rx="3"/><text class="m" x="63" y="194" text-anchor="middle" font-size="14">1</text><rect class="box" x="98" y="176" width="46" height="26" rx="3"/><text class="m" x="121" y="194" text-anchor="middle" font-size="14">1</text><text class="lbl m" x="160" y="194" text-anchor="middle">=</text><rect class="box" x="178" y="176" width="46" height="26" rx="3"/><text class="m" x="201" y="194" text-anchor="middle" font-size="14" font-weight="600">0</text>
+<line class="arrow" x1="270" y1="70" x2="270" y2="212" stroke-dasharray="3 4"/>
+<text x="308" y="86" font-size="14" font-weight="600">Applying it twice undoes it</text>
+<rect class="box-p" x="308" y="104" width="118" height="30" rx="4"/>
+<text class="m" x="367" y="124" text-anchor="middle" font-size="12.5">plaintext</text>
+<text class="lbl m" x="444" y="124" text-anchor="middle">⊕ key</text>
+<path class="arrow" d="M470 119 h26" marker-end="url(#ah)"/>
+<rect class="box-c" x="504" y="104" width="118" height="30" rx="4"/>
+<text class="m" x="563" y="124" text-anchor="middle" font-size="12.5">ciphertext</text>
+<rect class="box-c" x="308" y="158" width="118" height="30" rx="4"/>
+<text class="m" x="367" y="178" text-anchor="middle" font-size="12.5">ciphertext</text>
+<text class="lbl m" x="444" y="178" text-anchor="middle">⊕ key</text>
+<path class="arrow" d="M470 173 h26" marker-end="url(#ah)"/>
+<rect class="box-p" x="504" y="158" width="118" height="30" rx="4"/>
+<text class="m" x="563" y="178" text-anchor="middle" font-size="12.5">plaintext</text>
+<text class="tiny" x="308" y="212">the same operation, run again, returns the original</text>
+<defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+<path d="M0 0 L7 3.5 L0 7 z" fill="currentColor" class="lbl"/></marker></defs>
+</svg><figcaption>XOR is its own inverse. Every cipher on this site ends in this operation — they differ only in how the key stream is produced.</figcaption></figure>
+
+<p>The property that matters is that <strong>XOR is its own inverse</strong>. Apply the same key
+twice and you are back where you started. Encryption and decryption become the same operation,
+which is why stream ciphers need no separate decryption routine at all.</p>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · XOR is its own inverse</b><span>watch it undo itself</span></div>
+  <div class="sim-body">
+    <div class="row"><input type="text" id="s2-in" value="CONFIDENTIAL" aria-label="Text to XOR"></div>
+    <div class="row"><label for="s2-k">Key byte</label>
+      <input type="range" id="s2-k" min="1" max="255" value="90" style="flex:1">
+      <span class="stat" id="s2-kv">0x5A</span></div>
+    <div class="out tight" id="s2-out"></div>
+    <p class="stat">A single repeating key byte is the weakest possible cipher — 255 guesses breaks
+    it, and you can check each guess by looking for readable text.</p>
+  </div>
+</div>
+
+<h3>Why that toy is not a real cipher</h3>
+<p>The simulation above uses one key byte repeated forever. That fails immediately for two reasons,
+and understanding both explains what real ciphers must provide.</p>
+<ul>
+  <li><strong>The key space is tiny.</strong> 256 possibilities is not a search, it is a glance.
+      A real key has 2<sup>256</sup> possibilities.</li>
+  <li><strong>The key repeats.</strong> Even with a longer key, repetition leaks structure —
+      identical plaintext at the same key offset produces identical ciphertext, which is exactly
+      the flaw that breaks ECB mode in module 05.</li>
+</ul>
+<p>Real ciphers fix both by generating a keystream as long as the message, which never repeats,
+derived from a key large enough that guessing is hopeless. AES and ChaCha20 differ only in how
+they generate that stream — the combining step is still XOR.</p>
+
+<div class="note">
+<p><b>Where this is heading.</b> A file that has been base64-encoded looks scrambled and is
+trivially readable. A file that has been hashed is gone. A file that has been encrypted is
+perfectly intact and unreadable. Only the third produces the situation ransomware depends on: the
+data still exists, and access to it is controlled entirely by who holds the key.</p>
+</div>
+
+<div class="done-bar" data-p="01"><p>Finished this module?</p><button type="button" aria-pressed="false">Mark as read</button></div>
+<div class="pager"><a href="index.html"><em>Previous</em>Overview</a><a class="nxt" href="02-keys-and-randomness.html"><em>Next</em>Keys and randomness</a></div>
+<p class="kbd-hint">Use <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> to move between modules</p>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="01"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+const S1KEY = (async()=>await demoKeyBytes())();
+async function s1run(){
+  const v = document.getElementById('s1-in').value;
+  const k = await S1KEY;
+  document.getElementById('s1-b64').textContent = btoa(unescape(encodeURIComponent(v)));
+  document.getElementById('s1-sha').textContent = hex(await crypto.subtle.digest('SHA-256', bytes(v)));
+  const ct = await aesCBC(bytes(v), k, new Uint8Array(16));
+  document.getElementById('s1-aes').textContent = hex(ct);
+  document.getElementById('s1-key').textContent = 'demo key (public, fixed): ' + hex(k).slice(0,32) + '…';
+}
+async function s1rev(){
+  const v = document.getElementById('s1-in').value, k = await S1KEY;
+  const b64 = btoa(unescape(encodeURIComponent(v)));
+  let o = '';
+  o += 'Base64   → ' + decodeURIComponent(escape(atob(b64))) + '\n';
+  o += '           reversed with no key at all. This was never protection.\n\n';
+  o += 'SHA-256  → cannot be reversed, by anyone, ever.\n';
+  o += '           The output is 32 bytes whatever the input size, so the\n';
+  o += '           original is not in there to recover.\n\n';
+  const iv = new Uint8Array(16);
+  const ct = await aesCBC(bytes(v), k, iv);
+  const kk = await aesKey(k);
+  const pt = await crypto.subtle.decrypt({name:'AES-CBC', iv}, kk, ct);
+  o += 'AES-256  → ' + text(pt) + '\n';
+  o += '           reversed exactly, because we hold the key. Without it this\n';
+  o += '           line is unreachable. That gap is the whole of ransomware.';
+  document.getElementById('s1-rout').textContent = o;
+}
+document.getElementById('s1-go').addEventListener('click', s1run);
+document.getElementById('s1-rev').addEventListener('click', s1rev);
+document.getElementById('s1-in').addEventListener('input', s1run);
+s1run();
+
+function s2run(){
+  const v = document.getElementById('s2-in').value;
+  const k = +document.getElementById('s2-k').value;
+  document.getElementById('s2-kv').textContent = '0x' + k.toString(16).padStart(2,'0').toUpperCase();
+  const a = bytes(v);
+  const enc = a.map(b => b ^ k), dec = enc.map(b => b ^ k);
+  const show = u => [...u].map(b => (b>=32&&b<127)?String.fromCharCode(b):'·').join('');
+  document.getElementById('s2-out').textContent =
+    'plaintext   ' + show(a)   + '\n' +
+    'XOR key     ' + show(enc) + '   ← unreadable\n' +
+    'XOR again   ' + show(dec) + '   ← back to the start';
+}
+document.getElementById('s2-k').addEventListener('input', s2run);
+document.getElementById('s2-in').addEventListener('input', s2run);
+s2run();
+</script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The hybrid scheme — Evil Encryption Academy</title>
+<meta name="description" content="Symmetric encryption is fast but cannot protect its own key. Asymmetric encryption protects keys but cannot encrypt data. Combine them and you have the des">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Evil Encryption Academy">
+<meta property="og:title" content="The hybrid scheme">
+<meta property="og:description" content="Symmetric encryption is fast but cannot protect its own key. Asymmetric encryption protects keys but cannot encrypt data. Combine them and you have the des">
+<meta property="og:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The hybrid scheme">
+<meta name="twitter:description" content="Symmetric encryption is fast but cannot protect its own key. Asymmetric encryption protects keys but cannot encrypt data. Combine them and you have the des">
+<meta name="twitter:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+<script>
+/* Apply the stored theme before first paint so the page never flashes the wrong one. */
+(function(){try{var t=localStorage.getItem('eea-theme');
+if(t&&t!=='system')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<button class="menu-btn ghost" aria-controls="sidenav" aria-expanded="false">Menu</button>
+<div class="shell">
+<aside class="side" id="sidenav">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<div class="prog">
+  <div class="prog-bar"><div class="prog-fill"></div></div>
+  <p class="prog-txt"><span class="prog-count">0 of 13 read</span>
+    <button class="prog-reset" type="button">reset</button></p>
+</div>
+<nav>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <h4>Foundations</h4>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-keys-and-randomness.html" data-p="02"><i>02</i>Keys and randomness</a>
+  <a href="03-hashing-and-integrity.html" data-p="03"><i>03</i>Hashing and integrity</a>
+  <h4>The two families</h4>
+  <a href="04-symmetric.html" data-p="04"><i>04</i>Symmetric encryption</a>
+  <a href="05-modes.html" data-p="05"><i>05</i>Modes of operation</a>
+  <a href="06-asymmetric.html" data-p="06"><i>06</i>Asymmetric encryption</a>
+  <h4>Implementation</h4>
+  <a href="07-implementation.html" data-p="07"><i>07</i>Where the cryptography runs</a>
+  <h4>Ransomware encryption</h4>
+  <a href="08-hybrid.html" data-p="08"><i>08</i>The hybrid scheme</a>
+  <a href="09-coverage.html" data-p="09"><i>09</i>How much gets encrypted</a>
+  <a href="10-key-models.html" data-p="10"><i>10</i>Key models</a>
+  <a href="11-os-native.html" data-p="11"><i>11</i>OS-native encryption</a>
+  <a href="12-hypervisor.html" data-p="12"><i>12</i>Hypervisor encryption</a>
+  <h4>Putting it together</h4>
+  <a href="13-telling-them-apart.html" data-p="13"><i>13</i>Telling them apart</a>
+  <a href="reference.html" data-p="ref"><i>—</i>Reference</a>
+</nav>
+<div class="side-foot">
+  <button class="theme-btn" type="button">System theme</button>
+</div>
+</aside>
+<main id="content">
+<p class="crumb"><span>Ransomware encryption · 08</span><span>8 min read</span></p>
+<h1>The hybrid scheme</h1>
+<p class="lede">Symmetric encryption is fast but cannot protect its own key. Asymmetric encryption protects keys but cannot encrypt data. Combine them and you have the design behind essentially every family.</p>
+
+<h2>The combination</h2>
+<p>Neither family suffices alone, but their weaknesses are complementary. The hybrid scheme uses
+each for exactly what it is good at.</p>
+<ol>
+  <li>Generate a random symmetric key on the victim's machine</li>
+  <li>Encrypt the file with it — fast, and it handles any size</li>
+  <li>Encrypt <em>that key</em> with an embedded public key — slow, but it is only 32 bytes</li>
+  <li>Store the wrapped key alongside the file</li>
+  <li>Erase the plaintext symmetric key from memory</li>
+</ol>
+
+<p>The result is asymmetric security at symmetric speed. This is not sinister engineering — it is
+precisely how TLS and PGP work. The cryptography is textbook; only the intent differs.</p>
+
+<div class="note">
+<p><b>The sentence that describes every ransomware incident:</b> the locked file and the key that
+opens it are both sitting on the victim's disk. Neither helps, because the key is sealed under a
+public key whose private half was never on the network.</p>
+</div>
+
+<figure role="img" aria-label="Flowchart of the key lifecycle: public key obtained, ephemeral pair generated, symmetric key produced, file encrypted, symmetric key protected, result written to the file, local secrets wiped."><svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+<text x="24" y="28" font-size="14" font-weight="600">The key, from creation to erasure</text>
+<circle cx="40" cy="69" r="13" class="box-k"/><text class="m" x="40" y="74" text-anchor="middle" font-size="12" font-weight="600">1</text><rect class="box-k" x="68" y="52" width="230" height="34" rx="4"/><text x="183" y="74" text-anchor="middle" font-size="12">Public key obtained</text><text class="tiny" x="312" y="74">hardcoded at build time, or fetched from a server</text><path class="arrow" d="M40 84 v14" marker-end="url(#ah6)"/><circle cx="40" cy="115" r="13" class="box-p"/><text class="m" x="40" y="120" text-anchor="middle" font-size="12" font-weight="600">2</text><rect class="box-p" x="68" y="98" width="230" height="34" rx="4"/><text x="183" y="120" text-anchor="middle" font-size="12">Ephemeral pair generated</text><text class="tiny" x="312" y="120">a throwaway keypair, on the victim machine</text><path class="arrow" d="M40 130 v14" marker-end="url(#ah6)"/><circle cx="40" cy="161" r="13" class="box-p"/><text class="m" x="40" y="166" text-anchor="middle" font-size="12" font-weight="600">3</text><rect class="box-p" x="68" y="144" width="230" height="34" rx="4"/><text x="183" y="166" text-anchor="middle" font-size="12">Symmetric key produced</text><text class="tiny" x="312" y="166">32 bytes from the secure random generator</text><path class="arrow" d="M40 176 v14" marker-end="url(#ah6)"/><circle cx="40" cy="207" r="13" class="box-c"/><text class="m" x="40" y="212" text-anchor="middle" font-size="12" font-weight="600">4</text><rect class="box-c" x="68" y="190" width="230" height="34" rx="4"/><text x="183" y="212" text-anchor="middle" font-size="12">File encrypted</text><text class="tiny" x="312" y="212">AES or ChaCha20 over the contents</text><path class="arrow" d="M40 222 v14" marker-end="url(#ah6)"/><circle cx="40" cy="253" r="13" class="box-k"/><text class="m" x="40" y="258" text-anchor="middle" font-size="12" font-weight="600">5</text><rect class="box-k" x="68" y="236" width="230" height="34" rx="4"/><text x="183" y="258" text-anchor="middle" font-size="12">Symmetric key protected</text><text class="tiny" x="312" y="258">wrapped with the public key, or derived by agreement</text><path class="arrow" d="M40 268 v14" marker-end="url(#ah6)"/><circle cx="40" cy="299" r="13" class="box"/><text class="m" x="40" y="304" text-anchor="middle" font-size="12" font-weight="600">6</text><rect class="box" x="68" y="282" width="230" height="34" rx="4"/><text x="183" y="304" text-anchor="middle" font-size="12">Result written to the file</text><text class="tiny" x="312" y="304">the wrapped key or ephemeral public key is appended</text><path class="arrow" d="M40 314 v14" marker-end="url(#ah6)"/><circle cx="40" cy="345" r="13" class="box-c"/><text class="m" x="40" y="350" text-anchor="middle" font-size="12" font-weight="600">7</text><rect class="box-c" x="68" y="328" width="230" height="34" rx="4"/><text x="183" y="350" text-anchor="middle" font-size="12">Local secrets wiped</text><text class="tiny" x="312" y="350">the plaintext key and ephemeral private key are erased</text>
+<rect x="60" y="128" width="252" height="186" rx="5" fill="none" class="fill-p"
+      stroke="currentColor" stroke-dasharray="4 4" opacity="0.5"/>
+<text class="tiny fill-p" x="322" y="376">Between steps 3 and 7 the plaintext key exists on the victim machine.</text>
+<text class="tiny" x="322" y="392">Before step 3 it does not exist; after step 7 no local copy remains.</text>
+<defs><marker id="ah6" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+<path d="M0 0 L7 3.5 L0 7 z" fill="currentColor" class="lbl"/></marker></defs>
+</svg><figcaption>Seven steps. Only two of them involve the file at all — the rest is key handling, which is where every interesting question lives.</figcaption></figure>
+
+<p>Step one has a variant worth naming. The public key is usually embedded at build time, but some
+designs fetch it from attacker infrastructure when they run. That trades the offline property for
+flexibility — the operator can issue a fresh key per victim — at the cost of a dependency that can
+be cut. Embedding is the more robust choice and the more common one.</p>
+
+<figure role="img" aria-label="Flowchart of the key lifecycle: public key obtained, ephemeral pair generated, symmetric key produced, file encrypted, symmetric key protected, result written to the file, local secrets wiped."><svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+<text x="24" y="28" font-size="14" font-weight="600">The key, from creation to erasure</text>
+<circle cx="40" cy="69" r="13" class="box-k"/><text class="m" x="40" y="74" text-anchor="middle" font-size="12" font-weight="600">1</text><rect class="box-k" x="68" y="52" width="230" height="34" rx="4"/><text x="183" y="74" text-anchor="middle" font-size="12">Public key obtained</text><text class="tiny" x="312" y="74">hardcoded at build time, or fetched from a server</text><path class="arrow" d="M40 84 v14" marker-end="url(#ah6)"/><circle cx="40" cy="115" r="13" class="box-p"/><text class="m" x="40" y="120" text-anchor="middle" font-size="12" font-weight="600">2</text><rect class="box-p" x="68" y="98" width="230" height="34" rx="4"/><text x="183" y="120" text-anchor="middle" font-size="12">Ephemeral pair generated</text><text class="tiny" x="312" y="120">a throwaway keypair, on the victim machine</text><path class="arrow" d="M40 130 v14" marker-end="url(#ah6)"/><circle cx="40" cy="161" r="13" class="box-p"/><text class="m" x="40" y="166" text-anchor="middle" font-size="12" font-weight="600">3</text><rect class="box-p" x="68" y="144" width="230" height="34" rx="4"/><text x="183" y="166" text-anchor="middle" font-size="12">Symmetric key produced</text><text class="tiny" x="312" y="166">32 bytes from the secure random generator</text><path class="arrow" d="M40 176 v14" marker-end="url(#ah6)"/><circle cx="40" cy="207" r="13" class="box-c"/><text class="m" x="40" y="212" text-anchor="middle" font-size="12" font-weight="600">4</text><rect class="box-c" x="68" y="190" width="230" height="34" rx="4"/><text x="183" y="212" text-anchor="middle" font-size="12">File encrypted</text><text class="tiny" x="312" y="212">AES or ChaCha20 over the contents</text><path class="arrow" d="M40 222 v14" marker-end="url(#ah6)"/><circle cx="40" cy="253" r="13" class="box-k"/><text class="m" x="40" y="258" text-anchor="middle" font-size="12" font-weight="600">5</text><rect class="box-k" x="68" y="236" width="230" height="34" rx="4"/><text x="183" y="258" text-anchor="middle" font-size="12">Symmetric key protected</text><text class="tiny" x="312" y="258">wrapped with the public key, or derived by agreement</text><path class="arrow" d="M40 268 v14" marker-end="url(#ah6)"/><circle cx="40" cy="299" r="13" class="box"/><text class="m" x="40" y="304" text-anchor="middle" font-size="12" font-weight="600">6</text><rect class="box" x="68" y="282" width="230" height="34" rx="4"/><text x="183" y="304" text-anchor="middle" font-size="12">Result written to the file</text><text class="tiny" x="312" y="304">the wrapped key or ephemeral public key is appended</text><path class="arrow" d="M40 314 v14" marker-end="url(#ah6)"/><circle cx="40" cy="345" r="13" class="box-c"/><text class="m" x="40" y="350" text-anchor="middle" font-size="12" font-weight="600">7</text><rect class="box-c" x="68" y="328" width="230" height="34" rx="4"/><text x="183" y="350" text-anchor="middle" font-size="12">Local secrets wiped</text><text class="tiny" x="312" y="350">the plaintext key and ephemeral private key are erased</text>
+<rect x="60" y="128" width="252" height="186" rx="5" fill="none" class="fill-p"
+      stroke="currentColor" stroke-dasharray="4 4" opacity="0.5"/>
+<text class="tiny fill-p" x="322" y="376">Between steps 3 and 7 the plaintext key exists on the victim machine.</text>
+<text class="tiny" x="322" y="392">Before step 3 it does not exist; after step 7 no local copy remains.</text>
+<defs><marker id="ah6" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+<path d="M0 0 L7 3.5 L0 7 z" fill="currentColor" class="lbl"/></marker></defs>
+</svg><figcaption>Seven steps. Only two of them involve the file at all — the rest is key handling, which is where every interesting question lives.</figcaption></figure>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · walk the scheme</b><span>step through it</span></div>
+  <div class="sim-body">
+    <div class="row"><button id="s7-next">Next step</button>
+      <button class="ghost" id="s7-reset">Reset</button>
+      <span class="stat" id="s7-step"></span></div>
+    <div class="out tight" id="s7-out" style="min-height:230px"></div>
+  </div>
+</div>
+
+<h2>Why each property matters</h2>
+<table>
+<tr><th>Property</th><th>Consequence</th></tr>
+<tr><td>The public key is embedded at build time</td><td>No network call is needed to encrypt; the scheme works fully offline, even on an isolated machine</td></tr>
+<tr><td>The private key never leaves attacker infrastructure</td><td>Examining the software reveals the entire design and nothing that opens a file</td></tr>
+<tr><td>The symmetric key is random, often per file</td><td>Nothing is reusable between victims or between files</td></tr>
+<tr><td>The plaintext key is erased after use</td><td>It exists only briefly, in memory, while encryption runs</td></tr>
+<tr><td>The wrapped key travels with the file</td><td>Decryption is possible later without a lookup table or a database</td></tr>
+</table>
+
+<p>Each property closes a door. Together they produce a situation where the data is intact and
+complete, and remains unreadable no matter how thoroughly the software is understood — which is
+Kerckhoffs's principle from module 01, working for the attacker.</p>
+
+<h3>The offline property is worth dwelling on</h3>
+<p>Older designs sometimes contacted a server to fetch or register a key. That created a dependency:
+block the connection and encryption fails or becomes reversible. Embedding the public key removes
+the dependency entirely. There is nothing to block, because nothing needs to be sent.</p>
+
+<h2>Where the wrapped key is stored</h2>
+<p>The wrapped key has to travel with the file, or the attacker could not decrypt it later either.
+Four common placements:</p>
+
+<figure role="img" aria-label="Four diagrams showing where a wrapped key is placed relative to the ciphertext: appended as a footer, prepended as a header, stored in a separate sidecar file, or stored once for the whole host."><svg viewBox="0 0 700 330" xmlns="http://www.w3.org/2000/svg">
+<text class="m" x="30" y="30" font-size="12" font-weight="600">Footer — most common</text><rect class="box-c" x="30" y="38" width="430" height="30" rx="3"/><text class="m" x="245.0" y="57" text-anchor="middle" font-size="10">ciphertext</text><rect class="box-k" x="460" y="38" width="130" height="30" rx="3"/><text class="m" x="525.0" y="57" text-anchor="middle" font-size="10">wrapped key</text><rect class="box" x="590" y="38" width="80" height="30" rx="3"/><text class="m" x="630.0" y="57" text-anchor="middle" font-size="10">marker</text>
+<text class="m" x="30" y="104" font-size="12" font-weight="600">Header</text><rect class="box-k" x="30" y="112" width="130" height="30" rx="3"/><text class="m" x="95.0" y="131" text-anchor="middle" font-size="10">wrapped key</text><rect class="box" x="160" y="112" width="60" height="30" rx="3"/><text class="m" x="190.0" y="131" text-anchor="middle" font-size="10">IV</text><rect class="box-c" x="220" y="112" width="450" height="30" rx="3"/><text class="m" x="445.0" y="131" text-anchor="middle" font-size="10">ciphertext</text>
+<text class="m" x="30" y="178" font-size="12" font-weight="600">Sidecar — a second file</text><rect class="box-c" x="30" y="186" width="640" height="30" rx="3"/><text class="m" x="350.0" y="205" text-anchor="middle" font-size="10">ciphertext</text>
+<rect class="box-k" x="30" y="228" width="220" height="26" rx="3"/>
+<text class="m" x="140" y="246" text-anchor="middle" font-size="10">invoice.locked.key</text>
+<text class="tiny" x="262" y="246">the wrapped key lives in its own file alongside</text>
+<text class="m" x="30" y="292" font-size="12" font-weight="600">One key for the whole host</text>
+<rect class="box-c" x="30" y="300" width="430" height="22" rx="3"/>
+<rect class="box-c" x="470" y="300" width="90" height="22" rx="3"/>
+<text class="tiny" x="574" y="315">one wrapped blob, stored once</text>
+</svg><figcaption>Where the wrapped key is stored is one of the most reliable ways to tell two schemes apart — see module 09.</figcaption></figure>
+
+<p>The placement and shape of that blob is one of the most reliable ways to tell schemes apart —
+the subject of module 13. A 256-byte trailing blob and a 32-byte one imply completely different
+asymmetric designs.</p>
+
+<h2>Variations you will meet</h2>
+<table>
+<tr><th>Variation</th><th>What changes</th></tr>
+<tr><td>Wrap with RSA</td><td>The stored blob is exactly the modulus size — 256 or 512 bytes</td></tr>
+<tr><td>Wrap with ECIES</td><td>An ephemeral public key is stored instead — 32 or 33 bytes</td></tr>
+<tr><td>One key per host</td><td>A single wrapped blob, stored once rather than per file</td></tr>
+<tr><td>One key per file</td><td>A different wrapped blob attached to every file</td></tr>
+<tr><td>Key derived, not wrapped</td><td>Nothing is stored; the key is recomputed from an agreement</td></tr>
+</table>
+<p>That last row is the most modern variant and the subject of module 11. Nothing sensitive is
+stored at all — the value written to the file is a public key, which reveals nothing on its own.</p>
+
+<h2>A worked example</h2>
+<p>Follow one 40 KB spreadsheet through the scheme, watching the sizes.</p>
+<table>
+<tr><th>Stage</th><th>Size</th><th>Why</th></tr>
+<tr><td>Original file</td><td>40,953 bytes</td><td>—</td></tr>
+<tr><td>After AES-256-CBC</td><td>40,960 bytes</td><td>Padded up to the next multiple of 16</td></tr>
+<tr><td>Wrapped key appended</td><td>41,216 bytes</td><td>+256 bytes — an RSA-2048 ciphertext</td></tr>
+<tr><td>Marker appended</td><td>41,232 bytes</td><td>+16 bytes of family identifier</td></tr>
+</table>
+<p>Total overhead 279 bytes, and every one of them is accounted for: 7 bytes of padding, 256 for
+the wrapped key, 16 for the marker. When that arithmetic closes exactly, your reading of the
+scheme is probably right — which is the technique module 13 builds on.</p>
+<p>Note the proportions. The asymmetric operation, which is thousands of times slower per byte,
+ran once on 32 bytes. The symmetric operation ran on 40,953. That ratio is the entire design.</p>
+
+<h2>The same construction, elsewhere</h2>
+<p>Nothing here is unique to ransomware. The hybrid scheme is the standard way to combine the two
+families, and you rely on it constantly.</p>
+<table>
+<tr><th>System</th><th>Symmetric part</th><th>Asymmetric part</th></tr>
+<tr><td>TLS — every HTTPS connection</td><td>AES-GCM or ChaCha20-Poly1305 for the traffic</td><td>Key agreement during the handshake</td></tr>
+<tr><td>PGP / GPG email</td><td>A session key encrypts the message</td><td>That session key is wrapped per recipient</td></tr>
+<tr><td>Signal and similar messengers</td><td>Per-message symmetric keys</td><td>Curve25519 agreement to derive them</td></tr>
+<tr><td>Ransomware</td><td>AES or ChaCha20 on file contents</td><td>The file key is wrapped or derived</td></tr>
+</table>
+<p>The rows are the same construction. What differs is who holds the private half and whether you
+agreed to the arrangement. That is worth stating plainly, because it explains why the scheme cannot
+simply be banned or broken — it is load-bearing infrastructure for the rest of the internet.</p>
+
+<h2>How designs got here</h2>
+<p>The construction was not obvious from the start, and earlier approaches failed in instructive
+ways.</p>
+<table>
+<tr><th>Approach</th><th>Why it failed</th></tr>
+<tr><td>A single key hardcoded in the software</td><td>Extract it once and every victim is covered</td></tr>
+<tr><td>A key derived from machine details</td><td>Reproducible by anyone who knows the inputs</td></tr>
+<tr><td>A random key fetched from a server</td><td>Block the connection and encryption fails or is reversible</td></tr>
+<tr><td>Asymmetric encryption of file contents</td><td>Far too slow and too small to be practical</td></tr>
+<tr><td><strong>Hybrid with an embedded public key</strong></td><td>None of the above apply</td></tr>
+</table>
+<p>Each earlier design left a lever a defender could pull. The hybrid scheme removes every one of
+them, which is why it converged rather than continuing to vary.</p>
+
+<h2>What an attacker has to protect</h2>
+<p>Reduced to essentials, the scheme has exactly one secret: the private key on the operator's
+infrastructure. Everything else can be public without weakening it.</p>
+<ul>
+  <li>The malware can be obtained and disassembled — the design is not the secret</li>
+  <li>The embedded public key can be extracted — it only locks</li>
+  <li>The wrapped blobs can be collected — they cannot be opened</li>
+  <li>The cipher and mode can be identified — they are public standards</li>
+</ul>
+<p>This concentration is what makes the scheme robust, and it is also its only real fragility.
+Every published decryption tool in history has come from the private key being seized or leaked, or
+from an implementation mistake in how the symmetric key was produced — never from the mathematics
+giving way.</p>
+
+<div class="done-bar" data-p="08"><p>Finished this module?</p><button type="button" aria-pressed="false">Mark as read</button></div>
+<div class="pager"><a href="07-implementation.html"><em>Previous</em>Where the cryptography runs</a><a class="nxt" href="09-coverage.html"><em>Next</em>How much gets encrypted</a></div>
+<p class="kbd-hint">Use <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> to move between modules</p>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="08"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+const S7=[
+ {t:'Before anything happens — off the victim network',
+  b:'The operator generates an asymmetric keypair on their own\ninfrastructure.\n\n'+
+    '  PUBLIC KEY   →  embedded in the payload\n'+
+    '  PRIVATE KEY  →  never leaves their machine. Ever.\n\n'+
+    'This is the only step that does not happen on the victim host,\nand it is the reason the '+
+    'scheme works.'},
+ {t:'A random symmetric key is generated on the victim machine',
+  b:'  file key = 3f8a1c04 9b27ee51 6d0a4477 c1e9b382 …  (32 bytes)\n\n'+
+    'Produced by the secure random generator built into the OS.\nUnpredictable, and different on '+
+    'every machine and often every file.\n\nRIGHT NOW this key exists in plain form, in memory.'},
+ {t:'The file is encrypted with that symmetric key',
+  b:'  invoice.xlsx  ──[ AES-256 / ChaCha20 ]──▶  ciphertext\n\n'+
+    'Fast. Gigabytes per second. Size essentially unchanged.\n\n'+
+    'The file is now unreadable — but the key that opens it is still\nsitting in memory, a few '+
+    'centimetres away.'},
+ {t:'The symmetric key is wrapped with the embedded public key',
+  b:'  file key (32 bytes) ──[ RSA / Curve25519 ]──▶ wrapped key\n\n'+
+    'Only 32 bytes go through the slow operation, so the cost is\ntrivial. This is the step that '+
+    'makes the whole design work.\n\nThe wrapped key can now only be opened by the private key,\n'+
+    'which is not on this network.'},
+ {t:'The wrapped key is written to disk with the file',
+  b:'  [ ciphertext ........................ ][ wrapped key ]\n\n'+
+    'It has to be stored, or the operator could not decrypt later\neither. It is safe to leave in '+
+    'the open — without the private\nkey it is just noise.'},
+ {t:'The plaintext symmetric key is erased',
+  b:'  file key = 00000000 00000000 00000000 00000000\n\n'+
+    'Overwritten in memory. The only remaining copy of that key is\nthe wrapped one on disk, and '+
+    'it cannot be opened here.\n\nThe file, the wrapped key and the software are all present and\n'+
+    'fully understood. None of it opens the data.'}
+];
+let s7i=-1;
+function s7draw(){
+  const o=document.getElementById('s7-out');
+  if(s7i<0){ o.textContent='Press "Next step" to walk through the scheme.';
+    document.getElementById('s7-step').textContent=''; return; }
+  const s=S7[s7i];
+  o.textContent='STEP '+(s7i+1)+' — '+s.t+'\n'+'─'.repeat(62)+'\n\n'+s.b;
+  document.getElementById('s7-step').textContent='step '+(s7i+1)+' of '+S7.length;
+}
+document.getElementById('s7-next').addEventListener('click',()=>{ if(s7i<S7.length-1) s7i++; s7draw(); });
+document.getElementById('s7-reset').addEventListener('click',()=>{ s7i=-1; s7draw(); });
+s7draw();
+</script>
+</body>
+</html>

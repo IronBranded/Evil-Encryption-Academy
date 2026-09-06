@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where the cryptography runs — Evil Encryption Academy</title>
+<meta name="description" content="Two programs can perform identical AES-256 and be completely different artefacts. The difference is whether the cipher belongs to the operating system or t">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Evil Encryption Academy">
+<meta property="og:title" content="Where the cryptography runs">
+<meta property="og:description" content="Two programs can perform identical AES-256 and be completely different artefacts. The difference is whether the cipher belongs to the operating system or t">
+<meta property="og:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Where the cryptography runs">
+<meta name="twitter:description" content="Two programs can perform identical AES-256 and be completely different artefacts. The difference is whether the cipher belongs to the operating system or t">
+<meta name="twitter:image" content="https://ironbranded.github.io/Evil-Encryption-Academy/assets/card.svg">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/academy.css">
+<script>
+/* Apply the stored theme before first paint so the page never flashes the wrong one. */
+(function(){try{var t=localStorage.getItem('eea-theme');
+if(t&&t!=='system')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<button class="menu-btn ghost" aria-controls="sidenav" aria-expanded="false">Menu</button>
+<div class="shell">
+<aside class="side" id="sidenav">
+<a class="brand" href="index.html"><b>Evil Encryption Academy</b><span>encryption concepts, explained</span></a>
+<div class="prog">
+  <div class="prog-bar"><div class="prog-fill"></div></div>
+  <p class="prog-txt"><span class="prog-count">0 of 13 read</span>
+    <button class="prog-reset" type="button">reset</button></p>
+</div>
+<nav>
+  <a href="index.html" data-p="index"><i>—</i>Overview</a>
+  <h4>Foundations</h4>
+  <a href="01-what-encryption-is.html" data-p="01"><i>01</i>What encryption is</a>
+  <a href="02-keys-and-randomness.html" data-p="02"><i>02</i>Keys and randomness</a>
+  <a href="03-hashing-and-integrity.html" data-p="03"><i>03</i>Hashing and integrity</a>
+  <h4>The two families</h4>
+  <a href="04-symmetric.html" data-p="04"><i>04</i>Symmetric encryption</a>
+  <a href="05-modes.html" data-p="05"><i>05</i>Modes of operation</a>
+  <a href="06-asymmetric.html" data-p="06"><i>06</i>Asymmetric encryption</a>
+  <h4>Implementation</h4>
+  <a href="07-implementation.html" data-p="07"><i>07</i>Where the cryptography runs</a>
+  <h4>Ransomware encryption</h4>
+  <a href="08-hybrid.html" data-p="08"><i>08</i>The hybrid scheme</a>
+  <a href="09-coverage.html" data-p="09"><i>09</i>How much gets encrypted</a>
+  <a href="10-key-models.html" data-p="10"><i>10</i>Key models</a>
+  <a href="11-os-native.html" data-p="11"><i>11</i>OS-native encryption</a>
+  <a href="12-hypervisor.html" data-p="12"><i>12</i>Hypervisor encryption</a>
+  <h4>Putting it together</h4>
+  <a href="13-telling-them-apart.html" data-p="13"><i>13</i>Telling them apart</a>
+  <a href="reference.html" data-p="ref"><i>—</i>Reference</a>
+</nav>
+<div class="side-foot">
+  <button class="theme-btn" type="button">System theme</button>
+</div>
+</aside>
+<main id="content">
+<p class="crumb"><span>The two families · 07</span><span>5 min read</span></p>
+<h1>Where the cryptography runs</h1>
+<p class="lede">Two programs can perform identical AES-256 and be completely different artefacts. The difference is whether the cipher belongs to the operating system or to the program itself.</p>
+
+<h2>The same cipher, two architectures</h2>
+<p>Everything so far has treated a cipher as a thing that happens. It also has to happen
+<em>somewhere</em>, and there are two choices. Call the cryptography the operating system already
+provides, or compile your own into the program.</p>
+<p>The mathematics is identical either way. Almost everything else differs.</p>
+
+<figure role="img" aria-label="Diagram comparing two implementations. On the left the program calls the operating system's cryptographic libraries, so the key crosses a documented boundary. On the right the cipher is compiled into the program, so nothing crosses a boundary and the key is only ever an address inside the process."><svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg">
+<text x="24" y="26" font-size="14" font-weight="600">The same AES-256, two places to run it</text>
+
+<text x="24" y="60" font-size="13" font-weight="600" class="fill-p">Calling the operating system</text>
+<rect class="box-p" x="24" y="72" width="300" height="40" rx="4"/>
+<text x="174" y="97" text-anchor="middle" font-size="12.5">the program</text>
+<path class="arrow" d="M174 118 v22" marker-end="url(#ah5)"/>
+<text class="lbl m" x="184" y="134" font-size="10.5">documented call</text>
+<rect class="box-k" x="24" y="146" width="300" height="40" rx="4" stroke-width="2.4"/>
+<text x="174" y="165" text-anchor="middle" font-size="12">bcrypt.dll / advapi32.dll</text>
+<text class="tiny" x="174" y="179" text-anchor="middle">a named, published boundary</text>
+<path class="arrow" d="M174 192 v22" marker-end="url(#ah5)"/>
+<rect class="box" x="24" y="220" width="300" height="40" rx="4"/>
+<text x="174" y="240" text-anchor="middle" font-size="12">OS cryptographic provider</text>
+<text class="tiny" x="174" y="254" text-anchor="middle">the cipher runs here</text>
+<text class="tiny fill-p" x="24" y="292">The key crosses a named boundary, so the operation is</text>
+<text class="tiny fill-p" x="24" y="308">observable in principle without reading any code.</text>
+<text class="tiny" x="24" y="332">Small binary. No cipher constants present.</text>
+<text class="tiny" x="24" y="348">Depends on what the OS provides.</text>
+
+<line class="arrow" x1="360" y1="46" x2="360" y2="358" stroke-dasharray="3 4"/>
+
+<text x="392" y="60" font-size="13" font-weight="600" class="fill-c">Carrying its own</text>
+<rect class="box-c" x="392" y="72" width="284" height="188" rx="4"/>
+<text x="534" y="97" text-anchor="middle" font-size="12.5">the program</text>
+<line class="arrow" x1="410" y1="112" x2="658" y2="112" stroke-dasharray="2 3"/>
+<rect class="box-c" x="410" y="126" width="248" height="34" rx="3"/>
+<text x="534" y="147" text-anchor="middle" font-size="11.5">compiled-in cipher code</text>
+<rect class="box-c" x="410" y="170" width="248" height="34" rx="3"/>
+<text x="534" y="191" text-anchor="middle" font-size="11.5">the cipher runs here too</text>
+<text class="tiny" x="410" y="228">no call leaves the program</text>
+<text class="tiny fill-c" x="392" y="292">Nothing crosses a boundary. The key is only ever an</text>
+<text class="tiny fill-c" x="392" y="308">address inside the program.</text>
+<text class="tiny" x="392" y="332">Larger binary. Cipher constants present.</text>
+<text class="tiny" x="392" y="348">Runs anywhere, identically.</text>
+<defs><marker id="ah5" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+<path d="M0 0 L7 3.5 L0 7 z" fill="currentColor" class="lbl"/></marker></defs>
+</svg><figcaption>Identical cryptography, two architectures. The difference is whether the key ever crosses a named interface.</figcaption></figure>
+
+<h2>Calling the operating system</h2>
+<p>Every general-purpose operating system ships cryptography, because everything from disk
+encryption to network security needs it. On Windows there are two generations of interface.</p>
+
+<table>
+<tr><th></th><th>CryptoAPI — legacy</th><th>CNG — current</th></tr>
+<tr><td>Introduced</td><td>Windows NT era</td><td>Windows Vista</td></tr>
+<tr><td>Library</td><td><code>advapi32.dll</code></td><td><code>bcrypt.dll</code>, <code>ncrypt.dll</code></td></tr>
+<tr><td>Generate a key</td><td><code>CryptGenKey</code></td><td><code>BCryptGenerateSymmetricKey</code></td></tr>
+<tr><td>Encrypt</td><td><code>CryptEncrypt</code></td><td><code>BCryptEncrypt</code></td></tr>
+<tr><td>Random bytes</td><td><code>CryptGenRandom</code></td><td><code>BCryptGenRandom</code></td></tr>
+<tr><td>Import a public key</td><td><code>CryptImportKey</code></td><td><code>BCryptImportKeyPair</code></td></tr>
+</table>
+
+<p>A program taking this route contains almost no cryptography. It contains <em>requests</em> for
+cryptography — a list of function names, and code to marshal arguments across a boundary.</p>
+
+<h3>What that buys and costs</h3>
+<table>
+<tr><th>Consequence</th><th>Detail</th></tr>
+<tr><td>Small program</td><td>The cipher is not shipped; it is already on the machine</td></tr>
+<tr><td>No cipher constants</td><td>No S-box, no T-tables, no sigma string — they live in the OS library</td></tr>
+<tr><td>Correctness is borrowed</td><td>A well-tested implementation rather than a hand-rolled one</td></tr>
+<tr><td>Function names are visible</td><td>The program must name what it calls in order to call it</td></tr>
+<tr><td>Tied to the platform</td><td>The same code does not run on Linux or a hypervisor</td></tr>
+</table>
+
+<h2>Carrying its own</h2>
+<p>The alternative is to compile a cipher implementation directly into the program. Two common
+sources:</p>
+<ul>
+  <li><strong>A full cryptographic library</strong> such as libsodium, statically linked. Brings a
+      complete, well-audited set of primitives — and considerable size.</li>
+  <li><strong>A minimal implementation</strong> such as tiny-AES, a few hundred lines providing one
+      cipher and nothing else. Tiny, portable, and easy to embed.</li>
+</ul>
+<p>Languages matter here too. Rust and Go programs are statically linked by default, so a program
+written in either carries its cryptography whether or not the author thought about it.</p>
+
+<h3>What that buys and costs</h3>
+<table>
+<tr><th>Consequence</th><th>Detail</th></tr>
+<tr><td>Runs anywhere</td><td>No dependency on what the host provides. The same binary works across platforms</td></tr>
+<tr><td>Identical behaviour everywhere</td><td>No variation between OS versions or providers</td></tr>
+<tr><td>Cipher constants are present</td><td>The S-box or sigma string is inside the file</td></tr>
+<tr><td>No function names to read</td><td>Nothing is requested from outside, so nothing is named</td></tr>
+<tr><td>Larger program</td><td>A statically linked crypto library adds substantial size</td></tr>
+</table>
+
+<h2>The property that actually differs</h2>
+<p>Strip away the practical trade-offs and one structural difference remains: <strong>whether the
+key ever crosses a named boundary.</strong></p>
+<p>When a program calls the operating system, the key is handed across a documented interface with
+a published signature. The operation happens at a place that has a name, in a component shared by
+everything on the machine. That is true regardless of anyone's intent — it is a consequence of the
+architecture.</p>
+<p>When the cipher is compiled in, no such boundary exists. The key is an address in memory that
+gets passed to a function with no name, inside a program that never asks the system for anything.
+The whole operation is internal.</p>
+
+<div class="note">
+<p><b>Why this is worth understanding conceptually.</b> It explains something that otherwise looks
+inconsistent: two programs performing identical cryptography can present completely differently
+from outside. One announces every cryptographic step it takes, because it has to in order to take
+them. The other announces nothing. Neither is doing anything unusual — the difference is entirely
+architectural.</p>
+</div>
+
+<div class="sim">
+  <div class="sim-head"><b>Simulation · what ends up inside each program</b><span>same cryptography, different artefact</span></div>
+  <div class="sim-body">
+    <p>Both programs perform AES-256-CBC on the same file. Toggle between the two architectures.</p>
+    <div class="row">
+      <label for="imp-mode">Architecture</label>
+      <select id="imp-mode">
+        <option value="os">Calls the operating system</option>
+        <option value="static" selected>Carries its own cipher</option>
+        <option value="hw">Carries its own, using hardware AES</option>
+      </select>
+    </div>
+    <div class="out tight" id="imp-out" style="min-height:200px"></div>
+    <p class="stat" id="imp-note"></p>
+  </div>
+</div>
+
+<h2>Which gets chosen, and why</h2>
+<table>
+<tr><th>Situation</th><th>Typical choice</th><th>Reason</th></tr>
+<tr><td>Windows-only, older codebase</td><td>CryptoAPI or CNG</td><td>It is there, it is free, it is correct</td></tr>
+<tr><td>Cross-platform target</td><td>Embedded implementation</td><td>The OS interfaces differ or do not exist</td></tr>
+<tr><td>Written in Rust or Go</td><td>Embedded, by default</td><td>Static linking is the language norm</td></tr>
+<tr><td>Wants ChaCha20 or XChaCha20</td><td>Embedded</td><td>Not offered by the Windows interfaces</td></tr>
+<tr><td>Targeting Linux or a hypervisor</td><td>Embedded</td><td>There is no CNG to call</td></tr>
+</table>
+
+<p>That last group explains a real pattern. Software intended to run on hypervisors and Linux hosts
+has no Windows cryptographic interface available, so it must carry its own — and having carried its
+own, it can freely choose ciphers Windows does not offer. The platform decision and the cipher
+decision are linked, which is why cross-platform designs and ChaCha20 tend to appear together.</p>
+
+<h2>What each looks like from outside</h2>
+<table>
+<tr><th>Observation</th><th>Suggests</th></tr>
+<tr><td>Small program, names of OS crypto functions present</td><td>Calling the operating system</td></tr>
+<tr><td>Cipher constants present, no crypto function names</td><td>Embedded implementation</td></tr>
+<tr><td>Neither constants nor names</td><td>Hardware AES, or the program is compressed</td></tr>
+<tr><td>Constants for many ciphers at once</td><td>A whole library was linked in, most of it unused</td></tr>
+</table>
+<p>That last row is a genuine trap. Statically linking a full cryptographic library brings every
+primitive it contains, so a program can appear to support a dozen algorithms while using one.
+<strong>Presence is not use.</strong></p>
+
+<div class="done-bar" data-p="07"><p>Finished this module?</p><button type="button" aria-pressed="false">Mark as read</button></div>
+<div class="pager"><a href="06-asymmetric.html"><em>Previous</em>Asymmetric encryption</a><a class="nxt" href="08-hybrid.html"><em>Next</em>The hybrid scheme</a></div>
+<p class="kbd-hint">Use <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> to move between modules</p>
+</main>
+</div>
+<script src="assets/academy.js"></script>
+<script>
+(function(){var l=document.querySelector('.side a[data-p="07"]');if(l)l.classList.add('on');})();
+</script>
+<script>
+const IMP={
+ os:{title:'Calls the operating system',
+   size:'48 KB',
+   contains:['function names it must request:',
+     '    BCryptOpenAlgorithmProvider',
+     '    BCryptGenerateSymmetricKey',
+     '    BCryptEncrypt',
+     '    BCryptGenRandom',
+     '','library it depends on:','    bcrypt.dll'],
+   absent:['no AES S-box','no T-tables','no cipher code at all'],
+   note:'The cipher is not in this program. It is a list of requests, and the '+
+        'key crosses a documented boundary to reach the code that does the work.'},
+ static:{title:'Carries its own cipher',
+   size:'1.4 MB',
+   contains:['cipher constants compiled in:',
+     '    63 7c 77 7b f2 6b 6f c5 …   AES S-box',
+     '    52 09 6a d5 30 36 a5 38 …   AES inverse S-box',
+     '    a5 63 63 c6 84 7c 7c f8 …   T-table',
+     '','possibly also, if a whole library was linked:',
+     '    "expand 32-byte k"          ChaCha20 — maybe unused'],
+   absent:['no crypto function names','no dependency on OS libraries'],
+   note:'The cipher is inside this program. Nothing is requested from outside, so '+
+        'nothing is named — but the constants the algorithm requires are present.'},
+ hw:{title:'Carries its own, using hardware AES',
+   size:'52 KB',
+   contains:['processor instructions, not data:',
+     '    AESENC        one AES round',
+     '    AESENCLAST    the final round',
+     '    AESKEYGENASSIST  key expansion'],
+   absent:['no AES S-box','no T-tables','no crypto function names'],
+   note:'The substitution table lives in the silicon, so the program contains '+
+        'neither constants nor function names. It still performs ordinary AES-256.'}
+};
+function impRun(){
+  const m=IMP[document.getElementById('imp-mode').value];
+  let o='ARCHITECTURE   '+m.title+'\n'
+        +'PROGRAM SIZE   '+m.size+'\n'
+        +'\u2500'.repeat(58)+'\n\nPRESENT\n';
+  o+=m.contains.map(l=>l?'  '+l:'').join('\n');
+  o+='\n\nABSENT\n'+m.absent.map(l=>'  '+l).join('\n');
+  document.getElementById('imp-out').textContent=o;
+  document.getElementById('imp-note').textContent=m.note;
+}
+document.getElementById('imp-mode').addEventListener('change',impRun);
+impRun();
+</script>
+</body>
+</html>
