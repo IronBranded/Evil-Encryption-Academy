@@ -1,6 +1,11 @@
 # Evil Encryption Academy
 
-**[→ ironbranded.github.io/Evil-Encryption-Academy](https://ironbranded.github.io/Evil-Encryption-Academy/)**
+<h3 align="center">
+  <a href="https://ironbranded.github.io/Evil-Encryption-Academy/" target="_blank" rel="noopener noreferrer">
+    🟢 TRY THE ACADEMY🟢
+  </a>
+</h3>
+
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Modules](https://img.shields.io/badge/modules-11%20%2B%20reference-brightgreen.svg)
